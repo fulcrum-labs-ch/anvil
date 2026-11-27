@@ -1,0 +1,23 @@
+# examples/minimal.toml — the smallest useful hardening run.
+#
+#   anvil validate -c examples/minimal.toml
+#   anvil apply    -c examples/minimal.toml --dry-run   # inspect the scripts first
+#
+# The "minimal" built-in profile enables [sshd] (root login off, password
+# auth off, strong ciphers), [firewall] (deny inbound) and [updates]
+# (security updates). Your own keys below override the profile's.
+profile = "minimal"
+
+# The target. anvil connects with the system `ssh`, so your ~/.ssh/config,
+# agent, and jump hosts apply as-is. The login user must be root or have
+# passwordless (NOPASSWD) sudo — non-root sessions run under `sudo -n`.
+[host]
+address = "203.0.113.10"
+user = "admin"
+port = 22
+
+# A small override on top of the profile: only these accounts may log in
+# over SSH, and give slow typists a little longer to authenticate.
+[sshd]
+allow_users = ["admin"]
+login_grace_time = 45

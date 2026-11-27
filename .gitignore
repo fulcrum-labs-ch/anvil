@@ -1,0 +1,21 @@
+/target
+**/*.rs.bk
+.DS_Store
+# cargo-mutants output (local mutation-test runs; CI uses --in-diff in a sandbox)
+/mutants.out*
+# agent worktrees (Claude Code)
+/.claude/worktrees/
+# machine-specific agent notes (never committed)
+/*.local.md
+
+# python bytecode (skill scripts)
+__pycache__/
+
+# private ops repo and the paths .ops/link.sh links from it (never public)
+/.ops/
+/docs/plan
+/docs/capabilities
+/tasks.md
+/AGENTS.md
+/.opencode/
+/.claude/skills/

@@ -1,0 +1,17 @@
+# Acceptance fixture (--podman): a Forgejo runner whose container jobs
+# run on rootless Podman inside its unit, capped in ci.slice. Needs a
+# real runner for the token steps: export ANVIL_ACCEPT_FORGEJO_URL / _UUID / _TOKEN
+# (else a fake token: the unit restart-loops, the self-test still runs).
+include = ["host.toml"]
+
+[podman]
+
+[ci_resources]
+
+[forgejo_runner]
+url = "${ANVIL_ACCEPT_FORGEJO_URL:-https://forgejo.invalid/}"
+uuid = "${ANVIL_ACCEPT_FORGEJO_UUID:-00000000-0000-4000-8000-000000000000}"
+token = "${ANVIL_ACCEPT_FORGEJO_TOKEN:-accept-token-not-secret}"
+labels = ["debian:docker://docker.io/library/debian:trixie-slim"]
+docker = "podman"
+memory_max = "2G"

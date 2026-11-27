@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub runner credentials: v1 vs v2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #bf4520;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 16px;
+    }
+    .frame { max-width: 1320px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 1280px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Security · [github_runner] · v1 → v2</p>
+    <h1>v1 keeps no GitHub key on the box; v2 trades one in for fresh runners</h1>
+    <div class="diagram-container">
+<svg data-diagram="architecture-delta" viewBox="0 0 1280 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="github-runner-security-title github-runner-security-desc">
+<title id="github-runner-security-title">GitHub runner credentials: v1 vs v2</title>
+<desc id="github-runner-security-desc">In v1 (built) a persistent runner is registered once with a one-hour token from the operator's Mac and keeps only its own credential, which jobs running as the same user can read; in v2 (design only) a root JIT minter holds a long-lived GitHub App key and gives each job a fresh one-job runner, moving the high-value secret to root.</desc>
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+<marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+</defs>
+<rect x="0" y="0" width="1280" height="580" fill="#f5f5f5"/>
+<text x="24" y="52" fill="#2d3142" font-size="10" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.14em">V1 · BUILT · PERSISTENT</text>
+<text x="824" y="52" fill="#2d3142" font-size="10" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.14em">V2 · DESIGN ONLY · EPHEMERAL</text>
+<text x="480" y="52" fill="#5a6580" font-size="10" font-family="'Geist Mono', monospace" letter-spacing="0.14em">CHANGES V1 → V2</text>
+<g data-snapshot="before" data-grid="432 400 4" transform="translate(24 72)">
+<rect x="0" y="88" width="432" height="304" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.14)" stroke-width="0.8"/>
+<line x1="8" y1="204" x2="424" y2="204" stroke="#5a6580" stroke-opacity="0.5" stroke-width="0.8" stroke-dasharray="4,3"/>
+<rect x="164" y="82" width="112" height="12" rx="2" fill="#f5f5f5"/><text x="220" y="91" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">HOST · ROOT</text>
+<rect x="180" y="198" width="160" height="12" rx="2" fill="#f5f5f5"/><text x="260" y="207" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">GITHUB-RUNNER USER · NO SUDO</text>
+<text x="64" y="132" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace">no GitHub credential stored as root</text>
+<path data-kind="relationship" data-object-id="token" data-status="changed rewired" data-signature="cred=registration-token-1h" data-from="mac" data-to="listener" d="M48 64 V228" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+<path data-kind="relationship" data-object-id="poll" data-status="unchanged" data-signature="https-443-outbound" data-from="listener" data-to="github" d="M208 252 H372 Q380 252 380 244 V64" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path data-kind="relationship" data-object-id="run" data-status="unchanged" data-signature="spawn-job" data-from="listener" data-to="job" d="M116 292 V320" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="64" y="167" width="72" height="12" rx="2" fill="#f5f5f5"/><text x="100" y="176" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">1H REG TOKEN</text>
+<rect x="248" y="232" width="84" height="12" rx="2" fill="#f5f5f5"/><text x="290" y="241" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">POLL · 443 OUT</text>
+<rect x="128" y="300" width="56" height="12" rx="2" fill="#f5f5f5"/><text x="156" y="309" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">RUNS JOB</text>
+<g data-kind="component" data-object-id="mac" data-status="unchanged" data-signature="operator;gh+anvil">
+<rect x="0" y="8" width="144" height="56" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="0" y="8" width="144" height="56" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+<rect x="8" y="16" width="30" height="12" rx="2" fill="transparent" stroke="#5a6580" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="23" y="25" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">YOU</text>
+<text x="72" y="42" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Your Mac</text>
+<text x="72" y="56" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">gh api · anvil apply</text>
+</g>
+<g data-kind="component" data-object-id="github" data-status="unchanged" data-signature="github;repo=your-repo">
+<rect x="272" y="8" width="160" height="56" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="272" y="8" width="160" height="56" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+<rect x="280" y="16" width="36" height="12" rx="2" fill="transparent" stroke="#5a6580" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="298" y="25" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SAAS</text>
+<text x="352" y="42" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">GitHub</text>
+<text x="352" y="56" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">your-repo</text>
+</g>
+<g data-kind="component" data-object-id="listener" data-status="changed" data-signature="mode=persistent;jobs=many;creds=on-disk">
+<rect x="24" y="228" width="184" height="64" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="24" y="228" width="184" height="64" rx="6" fill="rgba(191,69,32,0.07)" stroke="#bf4520" stroke-width="1.4"/>
+<rect x="32" y="236" width="30" height="12" rx="2" fill="transparent" stroke="#bf4520" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="47" y="245" fill="#bf4520" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SVC</text>
+<text x="116" y="266" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Runner listener</text>
+<text x="116" y="280" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">persistent · many jobs</text>
+<rect x="184" y="236" width="16" height="12" rx="2" fill="#2d3142"/><text x="192" y="245" fill="#f5f5f5" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Δ</text>
+</g>
+<g data-kind="component" data-object-id="job" data-status="unchanged" data-signature="job-steps;user=github-runner">
+<rect x="24" y="320" width="184" height="56" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="24" y="320" width="184" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="32" y="328" width="30" height="12" rx="2" fill="transparent" stroke="#2d3142" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="47" y="337" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">JOB</text>
+<text x="116" y="354" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Workflow job</text>
+<text x="116" y="368" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">workspace wiped after</text>
+</g>
+<text x="232" y="330" fill="#bf4520" font-size="13" font-style="italic" font-family="'Instrument Serif', serif"><tspan x="232">Job = same user as the runner:</tspan><tspan x="232" dy="16">can read its credential and leave</tspan><tspan x="232" dy="16">files behind for the next job.</tspan></text>
+</g>
+<g data-snapshot="after" data-grid="432 400 4" transform="translate(824 72)">
+<rect x="0" y="88" width="432" height="304" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.14)" stroke-width="0.8"/>
+<line x1="8" y1="204" x2="424" y2="204" stroke="#5a6580" stroke-opacity="0.5" stroke-width="0.8" stroke-dasharray="4,3"/>
+<rect x="164" y="82" width="112" height="12" rx="2" fill="#f5f5f5"/><text x="220" y="91" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">HOST · ROOT</text>
+<rect x="180" y="198" width="160" height="12" rx="2" fill="#f5f5f5"/><text x="260" y="207" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">GITHUB-RUNNER USER · NO SUDO</text>
+<path data-kind="relationship" data-object-id="token" data-status="changed rewired" data-signature="cred=github-app-private-key" data-from="mac" data-to="minter" d="M48 64 V112" fill="none" stroke="#2e5aa8" stroke-width="1.2" stroke-dasharray="6,3" marker-end="url(#arrow-link)"/>
+<path data-kind="relationship" data-object-id="poll" data-status="unchanged" data-signature="https-443-outbound" data-from="listener" data-to="github" d="M208 252 H372 Q380 252 380 244 V64" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path data-kind="relationship" data-object-id="run" data-status="unchanged" data-signature="spawn-job" data-from="listener" data-to="job" d="M116 292 V320" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path data-kind="relationship" data-object-id="mint" data-status="added" data-signature="generate-jitconfig" data-from="minter" data-to="github" d="M208 136 H316 Q324 136 324 128 V64" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<path data-kind="relationship" data-object-id="jit" data-status="added" data-signature="jit-config-file-0600" data-from="minter" data-to="listener" d="M116 176 V228" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="60" y="83" width="80" height="12" rx="2" fill="#f5f5f5"/><text x="100" y="92" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">APP KEY · ONCE</text>
+<rect x="230" y="118" width="64" height="12" rx="2" fill="#f5f5f5"/><text x="262" y="127" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">JIT CONFIG</text>
+<rect x="124" y="184" width="72" height="12" rx="2" fill="#f5f5f5"/><text x="160" y="193" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">1-JOB CONFIG</text>
+<rect x="248" y="232" width="84" height="12" rx="2" fill="#f5f5f5"/><text x="290" y="241" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">POLL · 443 OUT</text>
+<rect x="128" y="300" width="56" height="12" rx="2" fill="#f5f5f5"/><text x="156" y="309" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">RUNS JOB</text>
+<g data-kind="component" data-object-id="mac" data-status="unchanged" data-signature="operator;gh+anvil">
+<rect x="0" y="8" width="144" height="56" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="0" y="8" width="144" height="56" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+<rect x="8" y="16" width="30" height="12" rx="2" fill="transparent" stroke="#5a6580" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="23" y="25" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">YOU</text>
+<text x="72" y="42" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Your Mac</text>
+<text x="72" y="56" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">gh api · anvil apply</text>
+</g>
+<g data-kind="component" data-object-id="github" data-status="unchanged" data-signature="github;repo=your-repo">
+<rect x="272" y="8" width="160" height="56" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="272" y="8" width="160" height="56" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+<rect x="280" y="16" width="36" height="12" rx="2" fill="transparent" stroke="#5a6580" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="298" y="25" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SAAS</text>
+<text x="352" y="42" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">GitHub</text>
+<text x="352" y="56" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">your-repo</text>
+</g>
+<g data-kind="component" data-object-id="minter" data-status="added" data-signature="root-execstartpre;app-key=0600">
+<rect x="24" y="112" width="184" height="64" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="24" y="112" width="184" height="64" rx="6" fill="rgba(191,69,32,0.07)" stroke="#bf4520" stroke-width="1.4"/>
+<rect x="32" y="120" width="36" height="12" rx="2" fill="transparent" stroke="#bf4520" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="50" y="129" fill="#bf4520" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">ROOT</text>
+<text x="116" y="150" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">JIT minter</text>
+<text x="116" y="164" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">holds App key · 0600</text>
+<rect x="184" y="120" width="16" height="12" rx="2" fill="#2d3142"/><text x="192" y="129" fill="#f5f5f5" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">+</text>
+</g>
+<g data-kind="component" data-object-id="listener" data-status="changed" data-signature="mode=ephemeral;jobs=1;creds=jit">
+<rect x="24" y="228" width="184" height="64" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="24" y="228" width="184" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="32" y="236" width="30" height="12" rx="2" fill="transparent" stroke="#2d3142" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="47" y="245" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SVC</text>
+<text x="116" y="266" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Runner listener</text>
+<text x="116" y="280" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">ephemeral · 1 job</text>
+<rect x="184" y="236" width="16" height="12" rx="2" fill="#2d3142"/><text x="192" y="245" fill="#f5f5f5" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Δ</text>
+</g>
+<g data-kind="component" data-object-id="job" data-status="unchanged" data-signature="job-steps;user=github-runner">
+<rect x="24" y="320" width="184" height="56" rx="6" fill="#f5f5f5"/>
+<rect data-role="bounds" x="24" y="320" width="184" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="32" y="328" width="30" height="12" rx="2" fill="transparent" stroke="#2d3142" stroke-opacity="0.45" stroke-width="0.8"/>
+<text x="47" y="337" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">JOB</text>
+<text x="116" y="354" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Workflow job</text>
+<text x="116" y="368" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">workspace wiped after</text>
+</g>
+<text x="232" y="160" fill="#bf4520" font-size="13" font-style="italic" font-family="'Instrument Serif', serif"><tspan x="232">The prize moves to root:</tspan><tspan x="232" dy="16">this key can register</tspan><tspan x="232" dy="16">runners for the org.</tspan></text>
+</g>
+<text data-change="CHANGED" data-target="listener" x="480" y="100" fill="#4f5d75" font-size="11" font-family="'Geist', sans-serif"><tspan x="480" dy="0" font-weight="600" fill="#2d3142">CHANGED listener</tspan><tspan x="480" dy="15">persistent, many jobs →</tspan><tspan x="480" dy="15">fresh runner, one job</tspan></text>
+<text data-change="CHANGED" data-target="token" x="480" y="163" fill="#4f5d75" font-size="11" font-family="'Geist', sans-serif"><tspan x="480" dy="0" font-weight="600" fill="#2d3142">CHANGED credential</tspan><tspan x="480" dy="15">1-hour registration token →</tspan><tspan x="480" dy="15">long-lived GitHub App key</tspan></text>
+<text data-change="REWIRED" data-target="token" x="480" y="226" fill="#4f5d75" font-size="11" font-family="'Geist', sans-serif"><tspan x="480" dy="0" font-weight="600" fill="#2d3142">REWIRED credential</tspan><tspan x="480" dy="15">your Mac → listener (once) →</tspan><tspan x="480" dy="15">your Mac → root minter</tspan></text>
+<text data-change="ADDED" data-target="minter" x="480" y="289" fill="#4f5d75" font-size="11" font-family="'Geist', sans-serif"><tspan x="480" dy="0" font-weight="600" fill="#2d3142">ADDED JIT minter</tspan><tspan x="480" dy="15">root service that holds the key</tspan></text>
+<text data-change="ADDED" data-target="mint" x="480" y="337" fill="#4f5d75" font-size="11" font-family="'Geist', sans-serif"><tspan x="480" dy="0" font-weight="600" fill="#2d3142">ADDED JIT CONFIG</tspan><tspan x="480" dy="15">minter asks GitHub per job</tspan></text>
+<text data-change="ADDED" data-target="jit" x="480" y="385" fill="#4f5d75" font-size="11" font-family="'Geist', sans-serif"><tspan x="480" dy="0" font-weight="600" fill="#2d3142">ADDED 1-JOB CONFIG</tspan><tspan x="480" dy="15">minter hands listener a 0600 file</tspan></text>
+<line x1="24" y1="500" x2="1256" y2="500" stroke="rgba(45,49,66,0.14)" stroke-width="0.8"/>
+<g font-family="'Geist Mono', monospace" font-size="9" fill="#4f5d75">
+<rect x="24" y="520" width="20" height="12" rx="3" fill="rgba(191,69,32,0.07)" stroke="#bf4520"/><text x="52" y="530">credential an attacker wants</text>
+<line x1="248" y1="526" x2="276" y2="526" stroke="#2e5aa8" stroke-width="1.2"/><text x="284" y="530">secret handed in by you</text>
+<line x1="456" y1="526" x2="484" y2="526" stroke="#5a6580" stroke-dasharray="4,3"/><text x="492" y="530">privilege boundary (root vs runner user)</text>
+<rect x="748" y="520" width="16" height="12" rx="2" fill="#2d3142"/><text x="756" y="529" fill="#f5f5f5" text-anchor="middle">+</text><text x="772" y="530">added in v2</text>
+<rect x="876" y="520" width="16" height="12" rx="2" fill="#2d3142"/><text x="884" y="529" fill="#f5f5f5" text-anchor="middle">Δ</text><text x="900" y="530">changed in v2</text>
+<line x1="1012" y1="526" x2="1040" y2="526" stroke="#2e5aa8" stroke-dasharray="6,3"/><text x="1048" y="530">rewired</text>
+</g>
+</svg>
+    </div>
+  </div>
+</body>
+</html>

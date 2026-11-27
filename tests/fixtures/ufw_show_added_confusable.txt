@@ -1,0 +1,8 @@
+# Confusable `ufw show added` output: ports that share a smaller port as a
+# numeric prefix (4430, 4434) but the smaller port is absent. The detect
+# needle for the smaller port must NOT satisfy these — the whole-word (`-w`)
+# grep stops a prefix port from matching. No comment text here repeats any
+# rule needle, so only the data lines below can match.
+Added user rules (see 'ufw status' for running firewall):
+ufw allow 4430/tcp
+ufw allow 4434/tcp

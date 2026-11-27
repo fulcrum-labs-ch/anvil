@@ -1,0 +1,10 @@
+# `ufw show added` after adding `from` rules with non-canonical addresses
+# (ufw 0.36.2, Debian 13). ufw warns "Rule changed after normalization" and
+# stores the canonical form: host bits masked, IPv6 lowercased and compressed.
+# Operator spellings: 10.0.0.5/24, 2001:DB8:0:0::1, 2001:db8:0000::/48,
+# 192.168.1.10. No comment text here repeats a rule needle.
+Added user rules (see 'ufw status' for running firewall):
+ufw allow from 10.0.0.0/24 to any port 9 proto tcp
+ufw allow from 2001:db8::1 to any port 9 proto tcp
+ufw allow from 2001:db8::/48 to any port 9 proto tcp
+ufw allow from 192.168.1.10 to any port 9 proto tcp

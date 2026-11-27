@@ -1,0 +1,39 @@
+# examples/forgejo-runner.toml — a Forgejo Actions runner for an external
+# Forgejo instance.
+#
+#   anvil validate -c examples/forgejo-runner.toml
+#
+# Create the runner in Forgejo (site admin, organisation, user or repository
+# Settings → Actions → Runners → Create new runner), copy the UUID below and
+# export the token; it is written to /etc/forgejo-runner/config.yml (0640,
+# root:forgejo-runner) and never shown by `anvil diff`:
+#
+#   export FORGEJO_RUNNER_TOKEN=<token from the dialog>
+#   anvil apply -c examples/forgejo-runner.toml
+#
+# Workflows then use:  runs-on: debian
+# With [forgejo] in the same config, omit `url` and set forgejo.actions = true.
+
+[host]
+address = "203.0.113.31"
+user = "admin"
+
+[sshd]
+disable_root_login = true
+disable_password_auth = true
+
+# The runner needs no inbound port; outbound HTTPS to Forgejo must stay open.
+[firewall]
+default_incoming = "deny"
+default_outgoing = "allow"
+
+[forgejo_runner]
+url = "https://git.example.org/"
+uuid = "00000000-0000-4000-8000-000000000000"
+token = "${FORGEJO_RUNNER_TOKEN:-}"
+# "host" jobs run unisolated as the forgejo-runner user. Docker labels
+# ("debian:docker://node:22-trixie") need docker = "group", which makes
+# every job root-equivalent on this host, or "podman" on a Podman host
+# (rootless, as forgejo-runner).
+labels = ["debian:host"]
+docker = "none"

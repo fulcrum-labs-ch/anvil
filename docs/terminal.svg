@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="346" viewBox="0 0 720 346" role="img" aria-labelledby="t d">
+  <title id="t">anvil apply, then anvil check</title>
+  <desc id="d">Terminal session: anvil apply changes four modules; anvil check reports them aligned. Output copied from docs/tutorial.md.</desc>
+  <rect x="0" y="0" width="720" height="346" rx="10" fill="#0D1117"/>
+  <rect x="0" y="0" width="720" height="36" rx="10" fill="#161B22"/>
+  <rect x="0" y="26" width="720" height="10" fill="#161B22"/>
+  <circle cx="22" cy="18" r="6" fill="#FF5F56"/>
+  <circle cx="42" cy="18" r="6" fill="#FFBD2E"/>
+  <circle cx="62" cy="18" r="6" fill="#27C93F"/>
+  <g font-family="ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" fill="#E6EDF3">
+    <text x="20" y="66"><tspan fill="#7EE787">$</tspan> anvil apply -c fresh-vps.toml</text>
+    <text x="20" y="88">== host 203.0.113.10 ==</text>
+    <text x="20" y="110">&#160;&#160;users&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<tspan fill="#E3B341">changed</tspan></text>
+    <text x="20" y="132">&#160;&#160;sshd&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<tspan fill="#E3B341">changed</tspan></text>
+    <text x="20" y="154">&#160;&#160;firewall&#160;&#160;&#160;&#160;&#160;&#160;&#160;<tspan fill="#E3B341">changed</tspan></text>
+    <text x="20" y="176">&#160;&#160;updates&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<tspan fill="#E3B341">changed</tspan></text>
+    <text x="20" y="214"><tspan fill="#7EE787">$</tspan> anvil check -c fresh-vps.toml</text>
+    <text x="20" y="236">== host 203.0.113.10 ==</text>
+    <text x="20" y="258">&#160;&#160;users&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<tspan fill="#7EE787">aligned</tspan></text>
+    <text x="20" y="280">&#160;&#160;sshd&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<tspan fill="#7EE787">aligned</tspan></text>
+    <text x="20" y="302">&#160;&#160;firewall&#160;&#160;&#160;&#160;&#160;&#160;&#160;<tspan fill="#7EE787">aligned</tspan></text>
+    <text x="20" y="324">&#160;&#160;updates&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<tspan fill="#7EE787">aligned</tspan></text>
+  </g>
+</svg>

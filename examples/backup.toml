@@ -1,0 +1,27 @@
+# examples/backup.toml — nightly encrypted backups with restic.
+#
+#   export RESTIC_PASSWORD='a long random passphrase'   # keep it in a password manager too
+#   anvil validate -c examples/backup.toml
+#   anvil apply    -c examples/backup.toml
+#   anvil check    -c examples/backup.toml   # drifted if the newest snapshot is > 30h old
+#
+# The password never goes into this file: ${RESTIC_PASSWORD} is read from
+# your environment and written only to /etc/restic/env (mode 0600) on the host.
+[host]
+address = "203.0.113.10"
+user = "admin"
+
+[restic]
+# A local path, sftp:, s3:, b2: or rest: URL. sftp uses root's SSH key and
+# known_hosts on the server, so set those up first.
+repository = "sftp:backup@backup.example.com:/srv/restic/web-1"
+password = "${RESTIC_PASSWORD}"
+# Backend credentials, e.g. for s3:
+# env = { AWS_ACCESS_KEY_ID = "${AWS_ACCESS_KEY_ID}", AWS_SECRET_ACCESS_KEY = "${AWS_SECRET_ACCESS_KEY}" }
+paths = ["/etc", "/home", "/root", "/srv", "/var/lib"]
+exclude = ["/srv/tmp"]
+schedule = "*-*-* 03:00"
+keep_daily = 7
+keep_weekly = 4
+keep_monthly = 12
+max_age_hours = 30

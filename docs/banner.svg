@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="240" viewBox="0 0 960 240" role="img" aria-labelledby="t d">
+  <title id="t">Fulcrum Anvil</title>
+  <desc id="d">Fulcrum Anvil: declarative server hardening for Debian and Ubuntu, over plain SSH.</desc>
+  <!-- transparent background: shows the page colour in GitHub light and dark mode -->
+  <rect x="120" y="150" width="720" height="4" rx="2" fill="#D9622B"/>
+  <text x="480" y="112" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="72" font-weight="700" fill="#D9622B">Fulcrum Anvil</text>
+  <text x="480" y="196" text-anchor="middle" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="24" fill="#8B949E">Harden Debian and Ubuntu servers from one TOML file</text>
+</svg>

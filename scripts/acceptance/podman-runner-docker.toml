@@ -1,0 +1,9 @@
+# Acceptance fixture (--podman): docker = "podman" on a Docker host.
+# validate must refuse it; it is never applied.
+include = ["host.toml"]
+
+[forgejo_runner]
+url = "https://forgejo.invalid/"
+uuid = "00000000-0000-4000-8000-000000000000"
+labels = ["debian:docker://docker.io/library/debian:trixie-slim"]
+docker = "podman"

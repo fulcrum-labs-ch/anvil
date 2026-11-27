@@ -1,0 +1,89 @@
+# examples/fleet.toml — one baseline applied across a fleet.
+#
+#   anvil validate -c examples/fleet.toml
+#   anvil apply    -c examples/fleet.toml --parallel 4              # up to 4 hosts at once
+#   anvil check    -c examples/fleet.toml --parallel 0 --output ndjson   # all hosts, one JSON line each
+#   anvil status   -c examples/fleet.toml --parallel 0
+#
+# A failure on one host never aborts the others; the exit code reflects the
+# aggregate. `--parallel 1` (the default) runs hosts sequentially.
+
+# Repeat [[hosts]] once per target. Each host is validated independently and
+# can carry its own port/identity/ssh options.
+[[hosts]]
+address = "10.0.1.11"
+user = "ops"
+
+[[hosts]]
+address = "10.0.1.12"
+user = "ops"
+identity_file = "~/.ssh/fleet_ed25519"
+
+[[hosts]]
+address = "10.0.1.13"
+user = "ops"
+ssh_options = ["ServerAliveInterval=30"]
+
+# --- baseline modules (presence enables; order is resolved safely) ----------
+
+# Provision the operations account everywhere (sudo drop-in + authorized_keys).
+[users]
+create = [
+  { name = "deploy", sudo = true, ssh_authorized_keys = ["ssh-ed25519 AAAAC3... deploy@ops"] },
+]
+
+# Common tooling; names are validated against the Debian package charset.
+[packages]
+install = ["curl", "vim", "htop"]
+
+# Hardened SSH on every box.
+[sshd]
+max_auth_tries = 3
+allow_users = ["ops", "deploy"]
+
+# Strong KEX/cipher/MAC policy, filtered on each host to what its ssh
+# supports (content is computed on the target, post-quantum where available).
+[ssh_crypto]
+
+# Network sysctls, dmesg/kptr restrictions.
+[kernel]
+harden_network = true
+
+# Blacklist rarely used kernel modules (usb-storage, exotic filesystems, ...).
+[kernel_modules]
+
+# Password quality and lockout policy (writes pwquality.conf/faillock.conf
+# only — never /etc/pam.d/).
+[pam]
+minlen = 14
+
+# Core dumps off, password aging, sysrq off.
+[process]
+
+# Hardened resolver: Quad9 + Cloudflare over TLS by default.
+[dns]
+
+# /tmp noexec, sticky-bit and world-writable scans.
+[filesystem]
+
+# CIS level 1 audit rules.
+[auditd]
+rule_set = "cis-level1"
+
+# Ban SSH brute-force attempts fleet-wide.
+[fail2ban]
+maxretry = 5
+
+# Host firewall: deny inbound, SSH auto-allowed before enable.
+[firewall]
+default_incoming = "deny"
+default_outgoing = "allow"
+
+# Install Lynis so `anvil score --threshold 80 --parallel 0` can gate the fleet.
+[lynis]
+
+# Security updates last, with a controlled reboot window.
+[updates]
+security_only = true
+auto_reboot = true
+reboot_time = "04:00"

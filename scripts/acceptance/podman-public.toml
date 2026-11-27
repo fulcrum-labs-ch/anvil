@@ -1,0 +1,16 @@
+# Acceptance fixture (--podman): a public PublishPort, which
+# `anvil validate` must refuse (rootful netavark skips ufw).
+include = ["host.toml"]
+
+[containers]
+runtime = "podman"
+
+[containers.quadlet.accept]
+content = '''
+[Container]
+Image=docker.io/library/nginx:alpine
+PublishPort=18091:80
+
+[Install]
+WantedBy=multi-user.target
+'''

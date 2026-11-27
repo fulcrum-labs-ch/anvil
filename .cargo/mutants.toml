@@ -1,0 +1,10 @@
+# cargo-mutants configuration (https://mutants.rs/).
+# Full run: `cargo mutants` (~all 900+ mutants; use -j N to parallelize).
+# Pre-merge spot check: `cargo mutants --in-diff <(git diff main)`.
+
+test_tool = "nextest"
+profile = "mutants"   # Cargo.toml: test profile without debug info
+
+# The SSH/local transport and the binary entrypoint are deliberately not
+# unit-tested (CLAUDE.md: "keep them thin"); mutants there are noise.
+exclude_globs = ["src/main.rs", "src/ssh.rs", "src/local.rs"]

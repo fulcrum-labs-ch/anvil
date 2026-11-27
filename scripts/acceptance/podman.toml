@@ -1,0 +1,18 @@
+# Acceptance fixture (--podman): rootful Podman Quadlet with a
+# loopback publish. The public variant (podman-public.toml) must fail validate.
+include = ["host.toml"]
+
+[podman]                                      # capped k8s-file logs
+
+[containers]
+runtime = "podman"
+
+[containers.quadlet.accept]
+content = '''
+[Container]
+Image=docker.io/library/nginx:alpine
+PublishPort=127.0.0.1:18090:80
+
+[Install]
+WantedBy=multi-user.target
+'''

@@ -1,0 +1,18 @@
+# Acceptance fixture: tutorial step 1 (examples/fresh-vps.toml). acceptance.sh
+# copies it next to a generated host.toml ([host] for the current login).
+include = ["host.toml"]
+
+[[users.create]]
+name = "ops"
+sudo = true
+shell = "/bin/bash"
+ssh_authorized_keys = ["${ANVIL_ACCEPT_PUBKEY}"]
+
+[sshd]
+port = 22
+
+[firewall]
+restrict_ssh = false
+
+[updates]
+auto_reboot = false          # the script reboots on purpose, once

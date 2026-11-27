@@ -1,0 +1,739 @@
+{
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "anvil-ci",
+    "project": "default",
+    "version": 0
+  },
+  "spec": {
+    "display": {
+      "name": "anvil: CI runners"
+    },
+    "duration": "6h",
+    "refreshInterval": "1m",
+    "variables": [],
+    "datasources": {},
+    "panels": {
+      "p00": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Busy minutes (last hour)",
+            "description": "Minutes in which CI used more than 0.1 core"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal",
+                "decimalPlaces": 0
+              },
+              "thresholds": {
+                "defaultColor": "#56a64b",
+                "steps": [
+                  {
+                    "value": 45,
+                    "color": "#f2b84b"
+                  },
+                  {
+                    "value": 60,
+                    "color": "#e0525e"
+                  }
+                ]
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum_over_time(((sum(rate(host_cgroup_cpu_usage_seconds_total{cgroup=\"ci.slice\"}[2m])) + (sum(rate(host_cgroup_cpu_usage_seconds_total{cgroup=~\"user\\\\.slice/user-[0-9]+\\\\.slice/user@[0-9]+\\\\.service/user\\\\.slice/docker-[^/]+\\\\.scope\"}[2m])) or vector(0))) > bool 0.1)[1h:1m])"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p01": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Sandboxes running",
+            "description": "sysbox job containers currently alive (busy or waiting for a job)"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal",
+                "decimalPlaces": 0
+              },
+              "thresholds": {
+                "defaultColor": "#5794f2",
+                "steps": []
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "count(host_cgroup_memory_current_bytes{cgroup=~\"ci\\\\.slice/docker-[^/]+\\\\.scope|user\\\\.slice/user-[0-9]+\\\\.slice/user@[0-9]+\\\\.service/user\\\\.slice/docker-[^/]+\\\\.scope\"}) or vector(0)"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p02": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "CI CPU",
+            "description": "Cores used by ci.slice"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal",
+                "decimalPlaces": 2
+              },
+              "thresholds": {
+                "defaultColor": "#5794f2",
+                "steps": []
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "(sum(rate(host_cgroup_cpu_usage_seconds_total{cgroup=\"ci.slice\"}[5m])) + (sum(rate(host_cgroup_cpu_usage_seconds_total{cgroup=~\"user\\\\.slice/user-[0-9]+\\\\.slice/user@[0-9]+\\\\.service/user\\\\.slice/docker-[^/]+\\\\.scope\"}[5m])) or vector(0)))"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p03": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "CI memory",
+            "description": "Memory the CI processes use (no reclaimable file cache)"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "bytes",
+                "decimalPlaces": 1
+              },
+              "thresholds": {
+                "defaultColor": "#5794f2",
+                "steps": []
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum(host_cgroup_memory_anon_bytes{cgroup=~\"ci\\\\.slice|user\\\\.slice/user-[0-9]+\\\\.slice/user@[0-9]+\\\\.service/user\\\\.slice/docker-[^/]+\\\\.scope\"})"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p04": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Runner services"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal",
+                "decimalPlaces": 0
+              },
+              "thresholds": {
+                "defaultColor": "#5794f2",
+                "steps": []
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "count(host_cgroup_memory_current_bytes{cgroup=~\"ci\\\\.slice/[^/]+\\\\.service\"})"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p05": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Runner errors (24h)",
+            "description": "Runner lines with journald priority 0-3"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal",
+                "decimalPlaces": 0
+              },
+              "thresholds": {
+                "defaultColor": "#56a64b",
+                "steps": [
+                  {
+                    "value": 1,
+                    "color": "#f2b84b"
+                  },
+                  {
+                    "value": 20,
+                    "color": "#e0525e"
+                  }
+                ]
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "GreptimeDBTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "GreptimeDBDatasource",
+                      "name": "sql-default"
+                    },
+                    "query": "SELECT count(*) FROM public.vector_logs WHERE \"_SYSTEMD_UNIT\" LIKE '%runner%' AND \"PRIORITY\" IN ('0','1','2','3') AND greptime_timestamp > now() - INTERVAL '24 hours'"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p06": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "CPU per runner",
+            "description": "Cores; each runner with its jobs (sandboxes included). Stacked = CI total"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal",
+                  "decimalPlaces": 2
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.5,
+                "connectNulls": false,
+                "stack": "all"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "GreptimeDBTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "GreptimeDBDatasource",
+                      "name": "sql-default"
+                    },
+                    "query": "SELECT t, runner, sum(v) AS v FROM (SELECT s.greptime_timestamp AS t, substr(s.cgroup, 10, length(s.cgroup) - 17) AS runner, s.v FROM (SELECT greptime_timestamp, cgroup, (max(greptime_value) RANGE '5m' - min(greptime_value) RANGE '5m') / 300 AS v FROM public.host_cgroup_cpu_usage_seconds_total WHERE cgroup LIKE 'ci.slice/%.service' AND cgroup NOT LIKE 'ci.slice/%/%' AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ALIGN '2m' BY (cgroup)) s UNION ALL SELECT d.greptime_timestamp AS t, n.name AS runner, d.v FROM (SELECT greptime_timestamp, cgroup, (max(greptime_value) RANGE '5m' - min(greptime_value) RANGE '5m') / 300 AS v FROM public.host_cgroup_cpu_usage_seconds_total WHERE cgroup LIKE '%/docker-%.scope' AND cgroup NOT LIKE '%.scope/%' AND (cgroup LIKE 'ci.slice/docker-%' OR cgroup LIKE 'user.slice/user-%.slice/user@%.service/user.slice/docker-%') AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ALIGN '2m' BY (cgroup)) d JOIN (SELECT DISTINCT \"CONTAINER_ID_FULL\" AS id, \"CONTAINER_NAME\" AS name FROM public.vector_logs WHERE \"CONTAINER_ID_FULL\" IS NOT NULL) n ON substr(d.cgroup, strpos(d.cgroup, '/docker-') + 8, 64) = n.id) GROUP BY t, runner ORDER BY t ASC LIMIT 20000;"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p07": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory per runner",
+            "description": "Memory the processes use (no reclaimable file cache); each runner with its jobs. Stacked = CI total"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "bytes",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.5,
+                "connectNulls": false,
+                "stack": "all"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "GreptimeDBTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "GreptimeDBDatasource",
+                      "name": "sql-default"
+                    },
+                    "query": "SELECT t, runner, sum(v) AS v FROM (SELECT s.greptime_timestamp AS t, substr(s.cgroup, 10, length(s.cgroup) - 17) AS runner, s.v FROM (SELECT greptime_timestamp, cgroup, max(greptime_value) RANGE '2m' AS v FROM public.host_cgroup_memory_anon_bytes WHERE cgroup LIKE 'ci.slice/%.service' AND cgroup NOT LIKE 'ci.slice/%/%' AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ALIGN '2m' BY (cgroup)) s UNION ALL SELECT d.greptime_timestamp AS t, n.name AS runner, d.v FROM (SELECT greptime_timestamp, cgroup, max(greptime_value) RANGE '2m' AS v FROM public.host_cgroup_memory_anon_bytes WHERE cgroup LIKE '%/docker-%.scope' AND cgroup NOT LIKE '%.scope/%' AND (cgroup LIKE 'ci.slice/docker-%' OR cgroup LIKE 'user.slice/user-%.slice/user@%.service/user.slice/docker-%') AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ALIGN '2m' BY (cgroup)) d JOIN (SELECT DISTINCT \"CONTAINER_ID_FULL\" AS id, \"CONTAINER_NAME\" AS name FROM public.vector_logs WHERE \"CONTAINER_ID_FULL\" IS NOT NULL) n ON substr(d.cgroup, strpos(d.cgroup, '/docker-') + 8, 64) = n.id) GROUP BY t, runner ORDER BY t ASC LIMIT 20000;"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p08": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Busy minutes per hour",
+            "description": "60 = CI busy the whole hour (a hung job looks like this)"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal",
+                  "decimalPlaces": 0
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum_over_time(((sum(rate(host_cgroup_cpu_usage_seconds_total{cgroup=\"ci.slice\"}[2m])) + (sum(rate(host_cgroup_cpu_usage_seconds_total{cgroup=~\"user\\\\.slice/user-[0-9]+\\\\.slice/user@[0-9]+\\\\.service/user\\\\.slice/docker-[^/]+\\\\.scope\"}[2m])) or vector(0))) > bool 0.1)[1h:1m])",
+                    "seriesNameFormat": "busy minutes"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p09": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "CPU per sandbox",
+            "description": "One line per job container, \"runner \u00b7 id\""
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal",
+                  "decimalPlaces": 2
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "GreptimeDBTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "GreptimeDBDatasource",
+                      "name": "sql-default"
+                    },
+                    "query": "SELECT c.greptime_timestamp, COALESCE(n.name || ' \u00b7 ' || substr(c.cgroup, strpos(c.cgroup, '/docker-') + 8, 12), substr(c.cgroup, strpos(c.cgroup, '/docker-') + 8, 12)) AS container_id, c.v FROM (SELECT greptime_timestamp, cgroup, (max(greptime_value) RANGE '5m' - min(greptime_value) RANGE '5m') / 300 AS v FROM public.host_cgroup_cpu_usage_seconds_total WHERE cgroup LIKE '%/docker-%.scope' AND cgroup NOT LIKE '%.scope/%' AND (cgroup LIKE 'ci.slice/docker-%' OR cgroup LIKE 'user.slice/user-%.slice/user@%.service/user.slice/docker-%') AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ALIGN '2m' BY (cgroup)) c LEFT JOIN (SELECT DISTINCT \"CONTAINER_ID_FULL\" AS id, \"CONTAINER_NAME\" AS name FROM public.vector_logs WHERE \"CONTAINER_ID_FULL\" IS NOT NULL) n ON substr(c.cgroup, strpos(c.cgroup, '/docker-') + 8, 64) = n.id ORDER BY c.greptime_timestamp ASC LIMIT 20000;"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p10": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory per sandbox",
+            "description": "Process memory, no file cache"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "bytes",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "GreptimeDBTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "GreptimeDBDatasource",
+                      "name": "sql-default"
+                    },
+                    "query": "SELECT c.greptime_timestamp, COALESCE(n.name || ' \u00b7 ' || substr(c.cgroup, strpos(c.cgroup, '/docker-') + 8, 12), substr(c.cgroup, strpos(c.cgroup, '/docker-') + 8, 12)) AS container_id, c.v FROM (SELECT greptime_timestamp, cgroup, max(greptime_value) RANGE '2m' AS v FROM public.host_cgroup_memory_anon_bytes WHERE cgroup LIKE '%/docker-%.scope' AND cgroup NOT LIKE '%.scope/%' AND (cgroup LIKE 'ci.slice/docker-%' OR cgroup LIKE 'user.slice/user-%.slice/user@%.service/user.slice/docker-%') AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ALIGN '2m' BY (cgroup)) c LEFT JOIN (SELECT DISTINCT \"CONTAINER_ID_FULL\" AS id, \"CONTAINER_NAME\" AS name FROM public.vector_logs WHERE \"CONTAINER_ID_FULL\" IS NOT NULL) n ON substr(c.cgroup, strpos(c.cgroup, '/docker-') + 8, 64) = n.id ORDER BY c.greptime_timestamp ASC LIMIT 20000;"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p11": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Runner log lines"
+          },
+          "plugin": {
+            "kind": "LogsTable",
+            "spec": {
+              "showTime": true,
+              "allowWrap": true,
+              "enableDetails": true
+            }
+          },
+          "queries": [
+            {
+              "kind": "LogQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "GreptimeDBLogQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "GreptimeDBDatasource",
+                      "name": "sql-default"
+                    },
+                    "query": "SELECT greptime_timestamp, \"PRIORITY\", \"_SYSTEMD_UNIT\", \"SYSLOG_IDENTIFIER\", message FROM public.vector_logs WHERE \"_SYSTEMD_UNIT\" LIKE '%runner%' AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ORDER BY greptime_timestamp DESC LIMIT 500;"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "layouts": [
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Overview",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/p00"
+              }
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/p01"
+              }
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/p02"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/p03"
+              }
+            },
+            {
+              "x": 16,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/p04"
+              }
+            },
+            {
+              "x": 20,
+              "y": 0,
+              "width": 4,
+              "height": 4,
+              "content": {
+                "$ref": "#/spec/panels/p05"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Load",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p06"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p07"
+              }
+            },
+            {
+              "x": 0,
+              "y": 9,
+              "width": 24,
+              "height": 7,
+              "content": {
+                "$ref": "#/spec/panels/p08"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Job sandboxes (per container)",
+            "collapse": {
+              "open": false
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p09"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p10"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Logs",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 12,
+              "content": {
+                "$ref": "#/spec/panels/p11"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

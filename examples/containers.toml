@@ -1,0 +1,44 @@
+# examples/containers.toml — run a Docker Compose project under systemd.
+#
+#   APP_DB_PASSWORD=... anvil validate -c examples/containers.toml
+#   anvil diff -c examples/containers.toml     # .env is never printed
+#
+# anvil writes /etc/anvil/compose/app/compose.yaml (0640) and .env (0600),
+# plus anvil-compose-app.service, which runs `docker compose up -d`.
+# Docker is installed from Docker's apt repo if it is missing.
+profile = "minimal"
+
+[host]
+address = "203.0.113.10"
+user = "admin"
+
+# Docker's published ports skip ufw. With iptables_off = true (the [docker]
+# default) containers also lose outbound internet. So: keep Docker's own
+# rules, and publish ports on 127.0.0.1 only (put a reverse proxy in front).
+[docker]
+iptables_off = false
+
+[containers.compose.app]
+# `${...}` here is left alone by anvil; docker compose fills it on the host
+# from the project's .env (the `env` table below).
+content = '''
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db:/var/lib/postgresql/data
+  web:
+    image: nginx:1.27
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18080:80"   # not 8080: crowdsec's API listens there
+volumes:
+  db:
+'''
+# Values come from your shell's environment at load time, so the secret is
+# not in this file. Drop the `:-change-me` default in a real config: then a
+# missing variable stops the run instead of deploying a weak password.
+env = { DB_PASSWORD = "${APP_DB_PASSWORD:-change-me}" }

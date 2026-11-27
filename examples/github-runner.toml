@@ -1,0 +1,38 @@
+# examples/github-runner.toml — a self-hosted GitHub Actions runner.
+#
+#   anvil validate -c examples/github-runner.toml
+#
+# For PRIVATE repositories only: on a public repo, any pull request can run
+# code on this host. The registration token is valid for one hour and is only
+# needed for the first apply (or after changing url, labels or group):
+#
+#   export GITHUB_RUNNER_TOKEN=$(gh api -X POST orgs/acme/actions/runners/registration-token --jq .token)
+#   anvil apply -c examples/github-runner.toml
+#
+# Workflows then use:  runs-on: [self-hosted, anvil]
+
+[host]
+address = "203.0.113.30"
+user = "admin"
+
+[sshd]
+disable_root_login = true
+disable_password_auth = true
+
+# The runner needs no inbound port; outbound HTTPS to GitHub must stay open.
+[firewall]
+default_incoming = "deny"
+default_outgoing = "allow"
+
+[github_runner]
+# "group" lets jobs use Docker, but every job is then root on this host.
+# "podman" (Podman host): container jobs on rootless Podman as github-runner.
+docker = "none"
+
+[github_runner.runners.build-1]
+url = "https://github.com/acme"
+token = "${GITHUB_RUNNER_TOKEN:-}"
+# Optional: lets `anvil rollback` deregister the runner on GitHub.
+remove_token = "${GITHUB_RUNNER_REMOVE_TOKEN:-}"
+labels = ["anvil"]
+group = "private-ci"

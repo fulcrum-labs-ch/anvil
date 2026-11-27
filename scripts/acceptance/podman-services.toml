@@ -1,0 +1,23 @@
+# Acceptance fixture (--podman): Forgejo, GreptimeDB and Headplane as
+# Quadlets on a Podman host. Throwaway secrets: the host is disposable.
+include = ["host.toml"]
+
+[podman]
+
+[forgejo]
+domain = "git.accept.invalid"
+deploy = "quadlet"
+secret_key = "accept-secret-key-not-secret"
+internal_token = "accept-internal-token-not-secret"
+jwt_secret = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+admin_username = "accept-admin"
+admin_email = "admin@accept.invalid"
+admin_password = "accept-password-not-secret"
+
+[greptimedb]                                  # 127.0.0.1:4000-4003
+
+[headscale]
+server_url = "https://hs.accept.invalid"
+listen_addr = "127.0.0.1:8080"
+headplane = true
+headplane_listen = "127.0.0.1:3001"           # forgejo has 3000

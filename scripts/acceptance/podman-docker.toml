@@ -1,0 +1,7 @@
+# Acceptance fixture (--podman): [docker] next to [podman]. One engine
+# per host: validate must refuse it; it is never applied.
+include = ["host.toml"]
+
+[docker]
+
+[podman]

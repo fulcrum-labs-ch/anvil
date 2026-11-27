@@ -1,0 +1,19 @@
+# examples/monitoring-single-vm.toml — one server that monitors itself.
+#
+#   anvil validate -c examples/monitoring-single-vm.toml
+#   anvil apply    -c examples/monitoring-single-vm.toml
+#
+# Runs the Beszel hub (web dashboard) and agent on the same machine. Both
+# stay on 127.0.0.1, so nothing new is reachable from the internet and the
+# provider firewall needs no change. After apply:
+#   1. ssh -L 8090:127.0.0.1:8090 admin@203.0.113.40   (then open
+#      http://localhost:8090 and create your admin account)
+#   2. "Add system": host 127.0.0.1, port 45876
+profile = "minimal"
+
+[host]
+address = "203.0.113.40"
+user = "admin"
+
+[beszel]
+hub = true

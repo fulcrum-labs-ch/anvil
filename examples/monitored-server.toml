@@ -1,0 +1,29 @@
+# examples/monitored-server.toml — a hardened server reporting to a Beszel hub.
+#
+#   anvil validate -c examples/monitored-server.toml
+#   anvil apply    -c examples/monitored-server.toml --dry-run
+#
+# Installs the Beszel monitoring agent (pinned, checksum-verified) under its
+# own unprivileged user. The agent port is never world-open: here the hub
+# reaches it over the tailnet, so ufw allows it on tailscale0 only and the
+# provider firewall (Hetzner, netcup) needs no inbound rule for it.
+profile = "minimal"
+
+[host]
+address = "203.0.113.30"
+user = "admin"
+
+[tailscale]
+login_server = "https://headscale.example.com"
+auth_key = "${TAILSCALE_AUTH_KEY:-}"
+
+[beszel]
+# The hub's public key, from the hub's "Add system" dialog.
+key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIReplaceWithYourHubKey"
+# listen_port = 45876
+# hub_addresses = ["198.51.100.7"]  # allow only these instead of tailscale0
+#
+# Or let the agent connect out to the hub (nothing listens, no firewall
+# rule). Export the token instead of committing it:
+# hub_url = "https://beszel.example.com"
+# token = "${BESZEL_TOKEN}"

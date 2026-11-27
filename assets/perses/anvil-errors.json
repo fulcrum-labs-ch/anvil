@@ -1,0 +1,119 @@
+{
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "anvil-errors",
+    "project": "default",
+    "version": 0
+  },
+  "spec": {
+    "display": {
+      "name": "anvil: errors (journald priority <= 3)"
+    },
+    "duration": "6h",
+    "refreshInterval": "1m",
+    "variables": [],
+    "datasources": {},
+    "panels": {
+      "rate": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Errors per unit (5 min)"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "list"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "GreptimeDBTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "GreptimeDBDatasource",
+                      "name": "sql-default"
+                    },
+                    "query": "SELECT greptime_timestamp, \"_SYSTEMD_UNIT\", count(message) RANGE '5m' AS errors FROM public.vector_logs WHERE \"PRIORITY\" IN ('0', '1', '2', '3') AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ALIGN '5m' BY (\"_SYSTEMD_UNIT\") ORDER BY greptime_timestamp ASC LIMIT 2000;"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "lines": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Error lines"
+          },
+          "plugin": {
+            "kind": "LogsTable",
+            "spec": {
+              "showTime": true,
+              "allowWrap": true,
+              "enableDetails": true
+            }
+          },
+          "queries": [
+            {
+              "kind": "LogQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "GreptimeDBLogQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "GreptimeDBDatasource",
+                      "name": "sql-default"
+                    },
+                    "query": "SELECT greptime_timestamp, \"PRIORITY\", \"_SYSTEMD_UNIT\", \"SYSLOG_IDENTIFIER\", message FROM public.vector_logs WHERE \"PRIORITY\" IN ('0', '1', '2', '3') AND greptime_timestamp >= to_timestamp_millis(${__from}) AND greptime_timestamp <= to_timestamp_millis(${__to}) ORDER BY greptime_timestamp DESC LIMIT 500;"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "layouts": [
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "anvil: errors (journald priority <= 3)",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 24,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/rate"
+              }
+            },
+            {
+              "x": 0,
+              "y": 8,
+              "width": 24,
+              "height": 20,
+              "content": {
+                "$ref": "#/spec/panels/lines"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+# examples/forgejo.toml — a Forgejo git forge behind [tls] (nginx + Let's Encrypt).
+#
+#   export FORGEJO_SECRET_KEY=... FORGEJO_INTERNAL_TOKEN=... FORGEJO_JWT_SECRET=...
+#   export FORGEJO_ADMIN_PASSWORD=...
+#   anvil apply -c examples/forgejo.toml
+#
+# Generate the secrets once with the forgejo binary (any machine):
+#   forgejo generate secret SECRET_KEY
+#   forgejo generate secret INTERNAL_TOKEN
+#   forgejo generate secret JWT_SECRET
+# Keep them in your secret store: losing SECRET_KEY makes 2FA secrets unreadable.
+#
+# Forgejo listens on 127.0.0.1:3000 only; nginx proxies https://git.example.com
+# to it. Git over SSH uses Forgejo's own SSH server on port 2222:
+#   git clone ssh://git@git.example.com:2222/owner/repo.git
+profile = "minimal"
+
+[host]
+address = "203.0.113.10"
+user = "admin"
+
+[packages]
+install = ["nginx"]
+
+[firewall]
+allow = [
+  { port = "80", proto = "tcp" },
+  { port = "443", proto = "tcp" },
+  { port = "2222", proto = "tcp", comment = "forgejo git over ssh" },
+]
+
+[tls]
+domains = ["git.example.com"]
+email = "admin@example.com"
+
+[forgejo]
+domain = "git.example.com"
+# require_signin_view = true     # hide everything from anonymous visitors
+# actions = true                 # Forgejo Actions (off by default; bring your own runner)
+# database = "postgres"          # needs db_password; the server must exist
+# Drop the `:-...` defaults in a real config: a missing variable then stops
+# the run instead of deploying a known secret.
+secret_key = "${FORGEJO_SECRET_KEY:-change-me}"
+internal_token = "${FORGEJO_INTERNAL_TOKEN:-change-me}"
+jwt_secret = "${FORGEJO_JWT_SECRET:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA}"
+# Created once, if missing. Forgejo asks for a new password at first login.
+admin_username = "forgeadmin"
+admin_email = "admin@example.com"
+admin_password = "${FORGEJO_ADMIN_PASSWORD:-change-me}"

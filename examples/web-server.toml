@@ -1,0 +1,58 @@
+# examples/web-server.toml — a public HTTPS server.
+#
+#   anvil validate -c examples/web-server.toml
+#   anvil diff     -c examples/web-server.toml    # per-file preview before applying
+#
+# Hardened SSH, a host firewall with HTTP/HTTPS open, brute-force banning,
+# TLS certificates, and unattended security updates. Module order is resolved
+# automatically and safely: sshd runs before the firewall, and the firewall
+# allows the SSH port before it enables; updates run last.
+
+[host]
+address = "203.0.113.20"
+user = "admin"
+
+# Hardened SSH daemon (drop-in under /etc/ssh/sshd_config.d/, validated with
+# `sshd -t` and auto-reverted if validation fails).
+[sshd]
+port = 22
+max_auth_tries = 3
+allow_users = ["admin"]
+
+# ufw: deny inbound by default, then explicit allows. The effective SSH port
+# is always permitted before `ufw enable` — that rule is built in, not listed.
+[firewall]
+default_incoming = "deny"
+default_outgoing = "allow"
+
+[[firewall.allow]]
+port = "80"
+proto = "tcp"
+comment = "HTTP (redirects and ACME challenges)"
+
+[[firewall.allow]]
+port = "443"
+proto = "tcp"
+comment = "HTTPS"
+
+# Ban brute-force sources. The sshd jail automatically watches the effective
+# SSH port configured above.
+[fail2ban]
+bantime = "1h"
+findtime = "10m"
+maxretry = 5
+
+# Certificates via certbot in webroot mode; nginx config is validated with
+# `nginx -t` and reverted on failure.
+[tls]
+provider = "certbot"
+domains = ["example.com", "www.example.com"]
+email = "ops@example.com"
+webroot = "/var/www/html"
+
+# Unattended security updates, rebooting (if required) in a quiet window.
+# Always ordered last so a reboot can't strand the rest of the run.
+[updates]
+security_only = true
+auto_reboot = true
+reboot_time = "03:30"

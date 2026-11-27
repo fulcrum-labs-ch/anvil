@@ -1,0 +1,19 @@
+# Acceptance fixture: tutorial step 2 (examples/fresh-vps-cis.toml), the
+# CIS Level 1 profile on port 22. `profile` must live here, in the top-level
+# file: an included file's `profile` is ignored.
+profile = "cis-level1"
+include = ["host.toml"]
+
+[[users.create]]
+name = "ops"
+sudo = true
+shell = "/bin/bash"
+ssh_authorized_keys = ["${ANVIL_ACCEPT_PUBKEY}"]
+
+[firewall]
+restrict_ssh = false         # same plain allow as step1: no allow→limit switch
+
+[updates]
+auto_reboot = false
+
+[lynis]

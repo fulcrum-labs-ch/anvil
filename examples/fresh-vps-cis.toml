@@ -1,0 +1,30 @@
+# examples/fresh-vps-cis.toml — the second config in docs/01_tutorial.md
+# (section 3): the built-in CIS Level 1 baseline on the box from
+# examples/fresh-vps.toml (14 modules). Local keys override the profile.
+
+profile = "cis-level1"
+# The profile enables, with hardened defaults: sshd, ssh_crypto, firewall,
+# kernel, kernel_modules, pam, process, auditd, filesystem, suid, fail2ban
+# and updates. Only list a section below to change something, e.g.
+#   [sshd]
+#   port = 2222              # see docs/03_operations.md before moving SSH
+
+[host]
+address = "203.0.113.10"
+user = "admin"                # root login is off since section 2
+identity_file = "~/.ssh/id_ed25519"
+
+[[users.create]]             # keep the admin account declared
+name = "admin"
+sudo = true
+shell = "/bin/bash"
+ssh_authorized_keys = ["ssh-ed25519 AAAA… admin@laptop"]
+
+[firewall]
+restrict_ssh = false         # fail2ban (from the profile) handles brute force
+
+[updates]
+auto_reboot = true           # kernel/libc patches need a reboot to apply
+reboot_time = "04:00"        # host local time
+
+[lynis]                      # installs Lynis for `anvil score`

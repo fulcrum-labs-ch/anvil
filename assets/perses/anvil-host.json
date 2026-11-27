@@ -1,0 +1,1596 @@
+{
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "anvil-host",
+    "project": "default",
+    "version": 0
+  },
+  "spec": {
+    "display": {
+      "name": "Server overview"
+    },
+    "duration": "6h",
+    "refreshInterval": "1m",
+    "variables": [],
+    "datasources": {},
+    "panels": {
+      "p00": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "CPU busy",
+            "description": "All cores together, 5-minute average"
+          },
+          "plugin": {
+            "kind": "GaugeChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "percent",
+                "decimalPlaces": 1
+              },
+              "max": 100,
+              "thresholds": {
+                "defaultColor": "#56a64b",
+                "steps": [
+                  {
+                    "value": 80,
+                    "color": "#f2b84b"
+                  },
+                  {
+                    "value": 90,
+                    "color": "#e0525e"
+                  }
+                ]
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "100 * (1 - sum(rate(host_cpu_seconds_total{mode=\"idle\"}[5m])) / sum(rate(host_cpu_seconds_total[5m])))",
+                    "seriesNameFormat": "all cores"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p01": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory used",
+            "description": "Excludes reclaimable page cache"
+          },
+          "plugin": {
+            "kind": "GaugeChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "percent",
+                "decimalPlaces": 1
+              },
+              "max": 100,
+              "thresholds": {
+                "defaultColor": "#56a64b",
+                "steps": [
+                  {
+                    "value": 80,
+                    "color": "#f2b84b"
+                  },
+                  {
+                    "value": 90,
+                    "color": "#e0525e"
+                  }
+                ]
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "100 * (1 - max(host_memory_available_bytes) / max(host_memory_total_bytes))",
+                    "seriesNameFormat": "of RAM"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p02": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Root disk used",
+            "description": "Filesystem mounted at /"
+          },
+          "plugin": {
+            "kind": "GaugeChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "percent",
+                "decimalPlaces": 1
+              },
+              "max": 100,
+              "thresholds": {
+                "defaultColor": "#56a64b",
+                "steps": [
+                  {
+                    "value": 75,
+                    "color": "#f2b84b"
+                  },
+                  {
+                    "value": 90,
+                    "color": "#e0525e"
+                  }
+                ]
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "100 * max(host_filesystem_used_ratio{mountpoint=\"/\",filesystem=~\"ext[234]|xfs|btrfs|zfs\"})",
+                    "seriesNameFormat": "/"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p03": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Uptime"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "seconds",
+                "decimalPlaces": 0
+              },
+              "thresholds": {
+                "defaultColor": "#5794f2",
+                "steps": []
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_uptime)"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p04": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "CPU cores"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal",
+                "decimalPlaces": 0
+              },
+              "thresholds": {
+                "defaultColor": "#5794f2",
+                "steps": []
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_logical_cpus)"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p05": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Load (5m) per core",
+            "description": "1.0 = every core busy"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal",
+                "decimalPlaces": 2
+              },
+              "thresholds": {
+                "defaultColor": "#56a64b",
+                "steps": [
+                  {
+                    "value": 0.8,
+                    "color": "#f2b84b"
+                  },
+                  {
+                    "value": 1.5,
+                    "color": "#e0525e"
+                  }
+                ]
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_load5) / scalar(count(count by (cpu) (host_cpu_seconds_total)))"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p06": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "RAM total"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "bytes",
+                "decimalPlaces": 1
+              },
+              "thresholds": {
+                "defaultColor": "#5794f2",
+                "steps": []
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_memory_total_bytes)"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p07": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Swap used"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "bytes",
+                "decimalPlaces": 0
+              },
+              "thresholds": {
+                "defaultColor": "#5794f2",
+                "steps": []
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_memory_swap_used_bytes)"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p08": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "OOM kills (24h)",
+            "description": "Processes killed by the kernel for lack of memory"
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal",
+                "decimalPlaces": 0
+              },
+              "thresholds": {
+                "defaultColor": "#56a64b",
+                "steps": [
+                  {
+                    "value": 1,
+                    "color": "#f2b84b"
+                  },
+                  {
+                    "value": 5,
+                    "color": "#e0525e"
+                  }
+                ]
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum(increase(host_memory_oom_kill_events_total[24h]))"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p09": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "CPU by mode",
+            "description": "Share of all cores; idle omitted"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "percent",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.5,
+                "connectNulls": false,
+                "stack": "all"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (mode) (rate(host_cpu_seconds_total{mode!=\"idle\"}[5m])) / scalar(count(count by (cpu) (host_cpu_seconds_total))) * 100",
+                    "seriesNameFormat": "{{mode}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p10": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Load average",
+            "description": "Compare with the core count"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal",
+                  "decimalPlaces": 2
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_load1)",
+                    "seriesNameFormat": "1m"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_load5)",
+                    "seriesNameFormat": "5m"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_load15)",
+                    "seriesNameFormat": "15m"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_logical_cpus)",
+                    "seriesNameFormat": "cores"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p11": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory breakdown"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "bytes",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.5,
+                "connectNulls": false,
+                "stack": "all"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_memory_used_bytes)",
+                    "seriesNameFormat": "used"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_memory_cached_bytes)",
+                    "seriesNameFormat": "cache"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_memory_buffers_bytes)",
+                    "seriesNameFormat": "buffers"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "max(host_memory_free_bytes)",
+                    "seriesNameFormat": "free"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p12": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory used & swap"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "percent",
+                  "decimalPlaces": 1
+                },
+                "min": 0,
+                "max": 100
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "100 * (1 - max(host_memory_available_bytes) / max(host_memory_total_bytes))",
+                    "seriesNameFormat": "memory used %"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "100 * max(host_memory_swap_used_bytes) / clamp_min(max(host_memory_swap_total_bytes), 1)",
+                    "seriesNameFormat": "swap used %"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p13": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Filesystem used",
+            "description": "Real filesystems only (no snaps, tmpfs, overlays)"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "percent",
+                  "decimalPlaces": 1
+                },
+                "min": 0,
+                "max": 100
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "100 * host_filesystem_used_ratio{filesystem=~\"ext[234]|xfs|btrfs|zfs\"}",
+                    "seriesNameFormat": "{{mountpoint}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p14": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Disk throughput",
+            "description": "Reads and writes per disk"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "bytes/sec",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (device) (rate(host_disk_read_bytes_total{device=~\"(sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+)\"}[5m]))",
+                    "seriesNameFormat": "{{device}} read"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (device) (rate(host_disk_written_bytes_total{device=~\"(sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+)\"}[5m]))",
+                    "seriesNameFormat": "{{device}} write"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p15": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Disk IOPS"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (device) (rate(host_disk_reads_completed_total{device=~\"(sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+)\"}[5m]))",
+                    "seriesNameFormat": "{{device}} reads"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (device) (rate(host_disk_writes_completed_total{device=~\"(sd[a-z]+|vd[a-z]+|xvd[a-z]+|nvme[0-9]+n[0-9]+)\"}[5m]))",
+                    "seriesNameFormat": "{{device}} writes"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p16": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Traffic",
+            "description": "Physical and tailnet interfaces (container veths omitted)"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "bytes/sec",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (device) (rate(host_network_receive_bytes_total{device!~\"lo|veth.*|docker.*|br-.*\"}[5m]))",
+                    "seriesNameFormat": "{{device}} in"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (device) (rate(host_network_transmit_bytes_total{device!~\"lo|veth.*|docker.*|br-.*\"}[5m]))",
+                    "seriesNameFormat": "{{device}} out"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p17": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "TCP connections"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal",
+                  "decimalPlaces": 0
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (state) (host_tcp_connections_total{state=~\"established|time_wait|close_wait|listen\"})",
+                    "seriesNameFormat": "{{state}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p18": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Network errors",
+            "description": "Should stay at 0"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal",
+                  "decimalPlaces": 2
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum(rate(host_network_receive_errs_total{device!~\"lo|veth.*|docker.*|br-.*\"}[5m]))",
+                    "seriesNameFormat": "receive errors"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum(rate(host_network_transmit_errs_total{device!~\"lo|veth.*|docker.*|br-.*\"}[5m]))",
+                    "seriesNameFormat": "transmit errors"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum(rate(host_network_transmit_packets_drop_total{device!~\"lo|veth.*|docker.*|br-.*\"}[5m]))",
+                    "seriesNameFormat": "transmit drops"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p19": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "CPU per user",
+            "description": "Cores used per login user's slice"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal",
+                  "decimalPlaces": 2
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "sum by (cgroup) (rate(host_cgroup_cpu_usage_seconds_total{cgroup=~\"user\\\\.slice/user-[0-9]+\\\\.slice\"}[5m]))",
+                    "seriesNameFormat": "{{cgroup}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p20": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory per user (without file cache)"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "bytes",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "host_cgroup_memory_anon_bytes{cgroup=~\"user\\\\.slice/user-[0-9]+\\\\.slice\"}",
+                    "seriesNameFormat": "{{cgroup}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p21": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Memory per service, top 10 (without file cache)"
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "position": "bottom",
+                "mode": "table",
+                "values": [
+                  "mean",
+                  "max",
+                  "last-number"
+                ]
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "bytes",
+                  "decimalPlaces": 1
+                },
+                "min": 0
+              },
+              "visual": {
+                "display": "line",
+                "lineWidth": 1.5,
+                "areaOpacity": 0.15,
+                "connectNulls": false
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "datasource": {
+                      "kind": "PrometheusDatasource",
+                      "name": "promql-default"
+                    },
+                    "query": "topk(10, host_cgroup_memory_anon_bytes{cgroup=~\"system\\\\.slice/[^/]+\\\\.service\"})",
+                    "seriesNameFormat": "{{cgroup}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "layouts": [
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Overview",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 4,
+              "height": 6,
+              "content": {
+                "$ref": "#/spec/panels/p00"
+              }
+            },
+            {
+              "x": 4,
+              "y": 0,
+              "width": 4,
+              "height": 6,
+              "content": {
+                "$ref": "#/spec/panels/p01"
+              }
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "width": 4,
+              "height": 6,
+              "content": {
+                "$ref": "#/spec/panels/p02"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 4,
+              "height": 3,
+              "content": {
+                "$ref": "#/spec/panels/p03"
+              }
+            },
+            {
+              "x": 16,
+              "y": 0,
+              "width": 4,
+              "height": 3,
+              "content": {
+                "$ref": "#/spec/panels/p04"
+              }
+            },
+            {
+              "x": 20,
+              "y": 0,
+              "width": 4,
+              "height": 3,
+              "content": {
+                "$ref": "#/spec/panels/p05"
+              }
+            },
+            {
+              "x": 12,
+              "y": 3,
+              "width": 4,
+              "height": 3,
+              "content": {
+                "$ref": "#/spec/panels/p06"
+              }
+            },
+            {
+              "x": 16,
+              "y": 3,
+              "width": 4,
+              "height": 3,
+              "content": {
+                "$ref": "#/spec/panels/p07"
+              }
+            },
+            {
+              "x": 20,
+              "y": 3,
+              "width": 4,
+              "height": 3,
+              "content": {
+                "$ref": "#/spec/panels/p08"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "CPU & load",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p09"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p10"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Memory",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p11"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p12"
+              }
+            },
+            {
+              "x": 0,
+              "y": 9,
+              "width": 24,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p21"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Disk",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 8,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p13"
+              }
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "width": 8,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p14"
+              }
+            },
+            {
+              "x": 16,
+              "y": 0,
+              "width": 8,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p15"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Network",
+            "collapse": {
+              "open": true
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p16"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 6,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p17"
+              }
+            },
+            {
+              "x": 18,
+              "y": 0,
+              "width": 6,
+              "height": 9,
+              "content": {
+                "$ref": "#/spec/panels/p18"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Users (coding agents)",
+            "collapse": {
+              "open": false
+            }
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/p19"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/p20"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

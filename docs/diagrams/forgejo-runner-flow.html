@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forgejo runner flow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #bf4520;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 16px;
+    }
+    .frame { max-width: 1320px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 1280px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Architecture · [forgejo_runner] · :host labels</p>
+    <h1>One runner on the host: it polls Forgejo, jobs run as forgejo-runner</h1>
+
+    <div class="diagram-container">
+      <svg viewBox="0 72 1280 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="forgejo-runner-flow-title forgejo-runner-flow-desc">
+        <title id="forgejo-runner-flow-title">Forgejo runner on the host</title>
+        <desc id="forgejo-runner-flow-desc">anvil installs forgejo-runner as anvil-forgejo-runner.service, in ci.slice when [ci_resources] is set; the daemon polls Forgejo over outbound HTTPS, runs each :host job as the unprivileged forgejo-runner user in its home, and reaches Docker only with docker = "group", whose containers run outside the slice.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf4520"/></marker>
+        </defs>
+
+        <rect x="0" y="72" width="1280" height="540" fill="#f5f5f5"/>
+
+        <!-- Zones -->
+        <rect x="68" y="112" width="216" height="160" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+        <rect x="76" y="116" width="88" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="120" y="125" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">YOUR MAC · ONCE</text>
+
+        <rect x="332" y="112" width="616" height="400" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+        <rect x="560" y="116" width="160" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="640" y="125" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">YOUR HOST · NO INBOUND PORT</text>
+
+        <rect x="348" y="144" width="584" height="248" rx="8" fill="none" stroke="#5a6580" stroke-opacity="0.5" stroke-width="0.8" stroke-dasharray="4,3"/>
+        <rect x="536" y="138" width="208" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="640" y="147" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">ANVIL-CI.SLICE · WITH [CI_RESOURCES]</text>
+
+        <rect x="996" y="112" width="216" height="160" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+        <rect x="1116" y="116" width="80" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="1156" y="125" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">YOUR FORGEJO</text>
+
+        <!-- Arrows (behind nodes) -->
+        <line x1="252" y1="208" x2="364" y2="208" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="548" y1="208" x2="732" y2="208" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="916" y1="196" x2="1028" y2="196" stroke="#bf4520" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+        <line x1="1028" y1="224" x2="916" y2="224" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+        <line x1="824" y1="240" x2="824" y2="304" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="732" y1="336" x2="548" y2="336" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="824" y1="368" x2="824" y2="424" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+        <!-- Arrow labels -->
+        <rect x="268" y="190" width="80" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="308" y="199" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">SSH · INSTALL</text>
+        <rect x="600" y="190" width="80" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="640" y="199" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">RUNS DAEMON</text>
+        <rect x="928" y="178" width="88" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="972" y="187" fill="#bf4520" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">POLL · 443 OUT</text>
+        <rect x="956" y="232" width="32" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="972" y="241" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">JOB</text>
+        <rect x="834" y="266" width="52" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="860" y="275" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">PER JOB</text>
+        <rect x="604" y="318" width="72" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="640" y="327" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">BUILD · TEST</text>
+        <rect x="834" y="404" width="68" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="868" y="413" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">OPT-IN ONLY</text>
+
+        <!-- Node: anvil apply -->
+        <rect x="100" y="176" width="152" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="100" y="176" width="152" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+        <rect x="108" y="184" width="28" height="12" rx="2" fill="transparent" stroke="rgba(90,101,128,0.40)" stroke-width="0.8"/>
+        <text x="122" y="193" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CLI</text>
+        <text x="176" y="212" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">anvil apply</text>
+        <text x="176" y="228" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">[forgejo_runner]</text>
+
+        <!-- Node: systemd unit -->
+        <rect x="364" y="176" width="184" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="364" y="176" width="184" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <rect x="372" y="184" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="386" y="193" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SVC</text>
+        <text x="456" y="212" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">systemd unit</text>
+        <text x="456" y="228" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">anvil-forgejo-runner.service</text>
+        <text x="456" y="260" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">OPT-IN CGROUP CAPS</text>
+        <text x="456" y="274" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">cpu_quota · memory_max · tasks_max</text>
+
+        <!-- Node: daemon (focal) -->
+        <rect x="732" y="176" width="184" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="732" y="176" width="184" height="64" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1"/>
+        <rect x="740" y="184" width="32" height="12" rx="2" fill="transparent" stroke="rgba(191,69,32,0.50)" stroke-width="0.8"/>
+        <text x="756" y="193" fill="#bf4520" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CORE</text>
+        <text x="824" y="212" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">forgejo-runner daemon</text>
+        <text x="824" y="228" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">token in config.yml</text>
+
+        <!-- Node: job -->
+        <rect x="732" y="304" width="184" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="732" y="304" width="184" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <rect x="740" y="312" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="754" y="321" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">JOB</text>
+        <text x="824" y="340" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Workflow job</text>
+        <text x="824" y="356" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">:host · as forgejo-runner</text>
+
+        <!-- Node: home (store) -->
+        <rect x="364" y="304" width="184" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="364" y="304" width="184" height="64" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+        <rect x="372" y="312" width="36" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.50)" stroke-width="0.8"/>
+        <text x="390" y="321" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">FILES</text>
+        <text x="456" y="340" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Runner home</text>
+        <text x="456" y="356" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">/var/lib/forgejo-runner</text>
+
+        <!-- Node: Docker (optional, outside the slice) -->
+        <rect x="732" y="424" width="184" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="732" y="424" width="184" height="64" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3"/>
+        <rect x="740" y="432" width="28" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.50)" stroke-width="0.8"/>
+        <text x="754" y="441" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">OPT</text>
+        <text x="824" y="460" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Docker daemon</text>
+        <text x="824" y="476" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">docker = "group" · root-equiv.</text>
+
+        <!-- Node: Forgejo (external) -->
+        <rect x="1028" y="176" width="152" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="1028" y="176" width="152" height="64" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+        <rect x="1036" y="184" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.22)" stroke-width="0.8"/>
+        <text x="1050" y="193" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+        <text x="1104" y="212" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Forgejo Actions</text>
+        <text x="1104" y="228" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">same host or remote</text>
+
+        <!-- Callout -->
+        <text x="364" y="436" fill="#4f5d75" font-size="13" font-style="italic" font-family="'Instrument Serif', serif">No sudo, read-only system, no container:</text>
+        <text x="364" y="454" fill="#4f5d75" font-size="13" font-style="italic" font-family="'Instrument Serif', serif">every job shares one user, one home, one token.</text>
+
+        <!-- Legend strip -->
+        <line x1="68" y1="548" x2="1212" y2="548" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+        <text x="68" y="568" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LEGEND</text>
+        <rect x="68" y="584" width="14" height="10" rx="2" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1"/>
+        <text x="88" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Always running</text>
+        <rect x="196" y="584" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="216" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Component</text>
+        <rect x="304" y="584" width="14" height="10" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+        <text x="324" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">State on host</text>
+        <rect x="420" y="584" width="14" height="10" rx="2" fill="#ffffff" stroke="#4f5d75" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="440" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Opt-in</text>
+        <rect x="508" y="584" width="14" height="10" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+        <text x="528" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">External</text>
+        <line x1="620" y1="589" x2="648" y2="589" stroke="#bf4520" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+        <text x="656" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Outbound HTTPS, the only connection</text>
+        <line x1="840" y1="589" x2="868" y2="589" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+        <text x="876" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Reply or optional</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

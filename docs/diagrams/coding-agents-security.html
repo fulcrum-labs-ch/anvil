@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coding agents isolation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #bf4520;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 16px;
+    }
+    .frame { max-width: 1320px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 1280px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Security · [coding_agents] · what a hijacked agent reaches</p>
+    <h1>One unprivileged login user: its own logins yes, root's secrets no</h1>
+    <div class="diagram-container">
+<svg viewBox="0 0 1280 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ca-title ca-desc">
+<title id="ca-title">Coding agents: what an agent reaches</title>
+<desc id="ca-desc">Orca on the Mac connects over SSH on the tailnet to the agent login user. Claude Code, OpenCode and Orca's server run as that unprivileged user inside a capped user slice. It reaches its own home and logins, the internet, loopback services and tailnet peers; it does not reach sudo, root-only secrets such as the GitHub App key, the Docker socket, runner trees or other homes.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker><marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf4520"/></marker></defs>
+<rect x="0" y="0" width="1280" height="480" fill="#f5f5f5"/>
+<rect x="24" y="196" width="176" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="112" y="226" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">Orca desktop</text>
+<text x="112" y="246" fill="#4f5d75" font-size="10" font-family="'Geist Mono', monospace" text-anchor="middle">your Mac</text>
+<line x1="200" y1="232" x2="296" y2="232" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="203.0" y="213" width="90" height="12" rx="2" fill="#f5f5f5"/><text x="248" y="222" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">SSH · TAILNET</text>
+<rect x="296" y="56" width="960" height="392" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.14)" stroke-width="0.8"/><rect x="711.0" y="50" width="130" height="12" rx="2" fill="#f5f5f5"/><text x="776.0" y="59" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">VPS · ANVIL-MANAGED</text>
+<rect x="320" y="96" width="320" height="320" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.14)" stroke-width="0.8"/><rect x="379.0" y="90" width="202" height="12" rx="2" fill="#f5f5f5"/><text x="480.0" y="99" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">USER-&lt;UID&gt;.SLICE · CAPPED</text>
+<rect x="344" y="124" width="272" height="56" rx="6" fill="#ffffff" stroke="#bf4520" stroke-width="1"/>
+<text x="480" y="148" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle" font-weight="600">agent  (login user, no sudo)</text>
+<text x="480" y="166" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">[users] + [coding_agents]</text>
+<rect x="344" y="200" width="272" height="40" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.40)" stroke-width="1"/>
+<text x="360" y="225" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start" font-weight="600">orcad</text>
+<text x="600" y="225" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">~/.orca-remote, by Orca</text>
+<rect x="344" y="252" width="272" height="40" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.40)" stroke-width="1"/>
+<text x="360" y="277" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start" font-weight="600">claude</text>
+<text x="600" y="277" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">~/.local/bin, self-updating</text>
+<rect x="344" y="304" width="272" height="40" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.40)" stroke-width="1"/>
+<text x="360" y="329" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start" font-weight="600">opencode</text>
+<text x="600" y="329" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">~/.local/bin, self-updating</text>
+<rect x="344" y="356" width="272" height="40" rx="6" fill="#ffffff" stroke="rgba(45,49,66,0.40)" stroke-width="1"/>
+<text x="360" y="381" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start" font-weight="600">skills · plugins</text>
+<text x="600" y="381" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">~/.agents, installed as agent</text>
+<line x1="640" y1="200" x2="696" y2="200" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="641.0" y="181" width="54" height="12" rx="2" fill="#f5f5f5"/><text x="668" y="190" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">REACHES</text>
+<rect x="696" y="96" width="264" height="200" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.14)" stroke-width="0.8"/><rect x="796.0" y="90" width="64" height="12" rx="2" fill="#f5f5f5"/><text x="828.0" y="99" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">AS AGENT</text>
+<text x="716" y="132" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✔</tspan>  its home, repos, agent logins</text>
+<text x="716" y="162" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✔</tspan>  internet (443)</text>
+<text x="716" y="192" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✔</tspan>  loopback services (Forgejo 3000 …)</text>
+<text x="716" y="222" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✔</tspan>  tailnet peers, tailscale status</text>
+<text x="716" y="252" fill="#2d3142" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✔</tspan>  world-readable files</text>
+<line x1="640" y1="360" x2="976" y2="360" stroke="#bf4520" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arrow-accent)"/>
+<rect x="727.0" y="341" width="162" height="12" rx="2" fill="#f5f5f5"/><text x="808" y="350" fill="#bf4520" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">NO SUDO · NO DOCKER GROUP</text>
+<rect x="976" y="96" width="256" height="320" rx="8" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.14)" stroke-width="0.8"/><rect x="1042.0" y="90" width="124" height="12" rx="2" fill="#f5f5f5"/><text x="1104.0" y="99" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">ROOT / OTHER USERS</text>
+<text x="996" y="132" fill="#5a6580" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✘</tspan>  GitHub App key (root 0600)</text>
+<text x="996" y="162" fill="#5a6580" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✘</tspan>  restic, Forgejo, Caddy secrets</text>
+<text x="996" y="192" fill="#5a6580" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✘</tspan>  Docker / Podman root socket</text>
+<text x="996" y="222" fill="#5a6580" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✘</tspan>  runner trees, sysbox sandboxes</text>
+<text x="996" y="252" fill="#5a6580" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✘</tspan>  other users' homes</text>
+<text x="996" y="282" fill="#5a6580" font-size="11" font-family="'Geist', sans-serif" text-anchor="start"><tspan font-weight="600">✘</tspan>  journal (adm group)</text>
+<text x="996" y="330" fill="#bf4520" font-size="9" font-family="'Geist Mono', monospace" text-anchor="start">Holds while the kernel holds:</text>
+<text x="996" y="346" fill="#bf4520" font-size="9" font-family="'Geist Mono', monospace" text-anchor="start">a local root exploit</text>
+<text x="996" y="362" fill="#bf4520" font-size="9" font-family="'Geist Mono', monospace" text-anchor="start">reaches everything here.</text>
+</svg>
+    </div>
+  </div>
+</body>
+</html>

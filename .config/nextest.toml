@@ -1,0 +1,11 @@
+# cargo-nextest configuration (https://nexte.st/docs/configuration/).
+# Run locally with `cargo nextest run`; CI uses `--profile ci`.
+
+[profile.default]
+# Report every failure in a run instead of stopping at the first one.
+fail-fast = false
+
+[profile.ci]
+retries = 0
+# Print failing test output immediately and again in the final summary.
+failure-output = "immediate-final"

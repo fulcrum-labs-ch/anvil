@@ -1,0 +1,19 @@
+# Acceptance fixture (--podman): the v2 runner's Podman sandbox. The
+# App is a throwaway key (the script makes it), so minting fails and backs
+# off by design; install, image, AppArmor and rollback are what is tested.
+include = ["host.toml"]
+
+[containers]
+runtime = "podman"
+
+[github_runner]
+mode = "ephemeral"
+app_id = 1
+installation_id = 1
+runner_group_id = 1
+app_key = "${ANVIL_ACCEPT_APP_KEY}"
+sandbox_disk = "10G"
+
+[github_runner.runners.accept]
+url = "https://github.com/anvil-acceptance-invalid"
+labels = ["anvil-accept"]

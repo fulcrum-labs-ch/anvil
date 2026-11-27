@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How a v2 runner gets each job</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #bf4520;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 16px;
+    }
+    .frame { max-width: 1320px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 1280px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Sequence · [github_runner] v2 · why the App exists</p>
+    <h1>The App key lets your server ask GitHub for a fresh one-job runner, every time</h1>
+    <div class="diagram-container">
+<svg viewBox="0 64 1280 772" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="github-runner-v2-title github-runner-v2-desc">
+<title id="github-runner-v2-title">How a v2 runner gets each job</title>
+<desc id="github-runner-v2-desc">anvil puts the GitHub App key root-only on the host once; for every job the minter signs a request with the key, gets a one-hour token, asks GitHub for a one-job runner in group my-runners, starts a fresh capped sysbox sandbox with it, the runner in the sandbox receives a queued job from your-repo, runs it with its own Docker, reports back and disappears, and the minter deletes the sandbox and its volume.</desc>
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+<marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf4520"/></marker>
+<marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+<marker id="arrow-open" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polyline points="0 0, 8 3, 0 6" fill="none" stroke="#4f5d75" stroke-width="1.2"/></marker>
+</defs>
+<rect x="0" y="64" width="1280" height="772" fill="#f5f5f5"/>
+<line x1="130" y1="160" x2="130" y2="760" stroke="#5a6580" stroke-opacity="0.45" stroke-dasharray="4,4"/>
+<line x1="450" y1="160" x2="450" y2="760" stroke="#5a6580" stroke-opacity="0.45" stroke-dasharray="4,4"/>
+<line x1="790" y1="160" x2="790" y2="760" stroke="#5a6580" stroke-opacity="0.45" stroke-dasharray="4,4"/>
+<line x1="1110" y1="160" x2="1110" y2="760" stroke="#5a6580" stroke-opacity="0.45" stroke-dasharray="4,4"/>
+<text x="40" y="196" fill="#5a6580" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">ONCE</text>
+<line x1="136" y1="206" x2="782" y2="206" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+<rect x="353" y="189" width="214" height="12" rx="2" fill="#f5f5f5"/><text x="460.0" y="198" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">ANVIL APPLY: APP KEY + SANDBOX IMAGE</text>
+<rect x="60" y="236" width="1150" height="470" rx="4" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.22)"/>
+<rect x="60" y="236" width="44" height="16" rx="2" fill="#f5f5f5" stroke="rgba(45,49,66,0.22)"/><text x="82" y="248" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.12em">LOOP</text>
+<text x="112" y="248" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.06em">[for every job, forever]</text>
+<line x1="784" y1="280" x2="458" y2="280" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="538" y="263" width="163" height="12" rx="2" fill="#f5f5f5"/><text x="620.0" y="272" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">1 · SIGNED WITH THE APP KEY</text>
+<line x1="456" y1="314" x2="782" y2="314" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="580" y="297" width="79" height="12" rx="2" fill="#f5f5f5"/><text x="620.0" y="306" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">1-HOUR TOKEN</text>
+<line x1="784" y1="352" x2="458" y2="352" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="519" y="335" width="202" height="12" rx="2" fill="#f5f5f5"/><text x="620.0" y="344" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">2 · ONE-JOB RUNNER, GROUP MY-RUNNERS</text>
+<line x1="456" y1="386" x2="782" y2="386" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="575" y="369" width="90" height="12" rx="2" fill="#f5f5f5"/><text x="620.0" y="378" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">ONE-JOB CONFIG</text>
+<line x1="796" y1="424" x2="1102" y2="424" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="840" y="407" width="219" height="12" rx="2" fill="#f5f5f5"/><text x="950.0" y="416" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">3 · START SANDBOX (CPU/RAM/DISK CAPS)</text>
+<line x1="1104" y1="462" x2="458" y2="462" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="693" y="445" width="174" height="12" rx="2" fill="#f5f5f5"/><text x="780.0" y="454" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">4 · ONLINE, WAITING FOR A JOB</text>
+<line x1="136" y1="500" x2="442" y2="500" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+<rect x="225" y="483" width="130" height="12" rx="2" fill="#f5f5f5"/><text x="290.0" y="492" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">GIT PUSH → JOB QUEUED</text>
+<line x1="456" y1="538" x2="1102" y2="538" stroke="#bf4520" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+<rect x="718" y="521" width="124" height="12" rx="2" fill="#f5f5f5"/><text x="780.0" y="530" fill="#bf4520" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">5 · HERE IS YOUR JOB</text>
+<path d="M1116 560 H1150 Q1158 560 1158 568 V574 Q1158 582 1150 582 H1124" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="922" y="562" width="174" height="12" rx="2" fill="#f5f5f5"/><text x="928" y="571" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.06em">6 · RUNS, USES ITS OWN DOCKER</text>
+<line x1="1104" y1="618" x2="458" y2="618" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-open)"/>
+<rect x="701" y="601" width="158" height="12" rx="2" fill="#f5f5f5"/><text x="780.0" y="610" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LOGS, RESULT · RUNNER GONE</text>
+<path d="M796 640 H830 Q838 640 838 648 V654 Q838 662 830 662 H804" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+<rect x="846" y="642" width="163" height="12" rx="2" fill="#f5f5f5"/><text x="852" y="651" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.06em">7 · DELETE SANDBOX + VOLUME</text>
+<text x="820" y="226" fill="#bf4520" font-size="13" font-style="italic" font-family="'Instrument Serif', serif" text-anchor="start"><tspan x="820" dy="0">The key never enters a sandbox:</tspan><tspan x="820" dy="15">a job can't reach it, only the minter.</tspan></text>
+<rect x="15.0" y="96" width="230" height="64" rx="6" fill="#f5f5f5"/><rect x="15.0" y="96" width="230" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+<rect x="23.0" y="104" width="30" height="12" rx="2" fill="transparent" stroke="#5a6580" stroke-opacity="0.45" stroke-width="0.8"/><text x="38.0" y="113" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">YOU</text>
+<text x="130" y="134" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Your Mac</text><text x="130" y="149" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">anvil apply · git push</text>
+<rect x="335.0" y="96" width="230" height="64" rx="6" fill="#f5f5f5"/><rect x="335.0" y="96" width="230" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1"/>
+<rect x="343.0" y="104" width="36" height="12" rx="2" fill="transparent" stroke="#5a6580" stroke-opacity="0.45" stroke-width="0.8"/><text x="361.0" y="113" fill="#5a6580" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SAAS</text>
+<text x="450" y="134" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">GitHub</text><text x="450" y="149" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">your-repo · group my-runners</text>
+<rect x="675.0" y="96" width="230" height="64" rx="6" fill="#f5f5f5"/><rect x="675.0" y="96" width="230" height="64" rx="6" fill="rgba(191,69,32,0.07)" stroke="#bf4520" stroke-width="1.4"/>
+<rect x="683.0" y="104" width="36" height="12" rx="2" fill="transparent" stroke="#bf4520" stroke-opacity="0.45" stroke-width="0.8"/><text x="701.0" y="113" fill="#bf4520" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">ROOT</text>
+<text x="790" y="134" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Minter (host)</text><text x="790" y="149" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">holds the App key · 0600</text>
+<rect x="995.0" y="96" width="230" height="64" rx="6" fill="#f5f5f5"/><rect x="995.0" y="96" width="230" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<rect x="1003.0" y="104" width="48" height="12" rx="2" fill="transparent" stroke="#2d3142" stroke-opacity="0.45" stroke-width="0.8"/><text x="1027.0" y="113" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SYSBOX</text>
+<text x="1110" y="134" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Fresh sandbox</text><text x="1110" y="149" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">1 runner + own Docker</text>
+<line x1="40" y1="780" x2="1240" y2="780" stroke="rgba(45,49,66,0.14)" stroke-width="0.8"/>
+<line x1="40" y1="806" x2="68" y2="806" stroke="#2e5aa8" stroke-width="1.2"/><text x="76" y="810" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace">you</text>
+<line x1="200" y1="806" x2="228" y2="806" stroke="#4f5d75" stroke-width="1.2"/><text x="236" y="810" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace">call</text>
+<line x1="340" y1="806" x2="368" y2="806" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4"/><text x="376" y="810" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace">reply / async</text>
+<line x1="520" y1="806" x2="548" y2="806" stroke="#bf4520" stroke-width="1.2"/><text x="556" y="810" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace">the job arrives</text>
+<rect x="700" y="800" width="20" height="12" rx="3" fill="rgba(191,69,32,0.07)" stroke="#bf4520"/><text x="728" y="810" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace">holds the secret</text>
+</svg>
+    </div>
+  </div>
+</body>
+</html>

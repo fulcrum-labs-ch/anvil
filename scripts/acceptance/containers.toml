@@ -1,0 +1,15 @@
+# Acceptance fixture (--containers): Docker with the default
+# iptables_off = true and one compose project with a loopback and a public publish.
+include = ["host.toml"]
+
+[docker]
+
+[containers.compose.accept]
+content = '''
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "127.0.0.1:18080:80"
+      - "0.0.0.0:18081:80"
+'''

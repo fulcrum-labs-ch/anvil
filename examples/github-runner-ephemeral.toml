@@ -1,0 +1,37 @@
+# examples/github-runner-ephemeral.toml — ephemeral GitHub runners: one job
+# per sysbox sandbox with its own Docker (mode = "ephemeral", amd64).
+#
+#   export GITHUB_APP_KEY="$(cat github-app.pem)"
+#   anvil apply -c examples/github-runner-ephemeral.toml
+#
+# The GitHub App needs only the org permission "Self-hosted runners: write".
+# Workflows then use:  runs-on: [self-hosted, anvil]
+
+[host]
+address = "203.0.113.31"
+user = "admin"
+
+[firewall]
+default_incoming = "deny"
+default_outgoing = "allow"
+
+# All CI work together gets at most 8 cores and 20G; sshd wins under load.
+[ci_resources]
+cpu_quota = "800%"
+memory_max = "20G"
+
+[github_runner]
+mode = "ephemeral"
+app_id = 123456
+installation_id = 7654321
+app_key = "${GITHUB_APP_KEY}"
+runner_group_id = 3
+capacity = 2                 # sandboxes waiting or running at once
+sandbox_cpus = "2"
+sandbox_memory = "4g"
+sandbox_disk = "40G"         # Docker data and _work, re-made for every job
+sandbox_packages = ["build-essential", "pkg-config"]  # baked into the sandbox image
+
+[github_runner.runners.ci]
+url = "https://github.com/acme"   # org runner (the App mints org runners)
+labels = ["anvil"]

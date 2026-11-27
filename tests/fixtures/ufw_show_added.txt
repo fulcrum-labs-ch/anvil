@@ -1,0 +1,12 @@
+# Captured `ufw show added` output (ufw 0.36, Debian/Ubuntu). Each line is the
+# command that would re-add the rule, with the protocol resolved to
+# <port>/<proto>. anvil's detect greps this whole-word (`grep -qwF`) for each
+# rule's needle, so the needle must match exactly the rule converge produced.
+Added user rules (see 'ufw status' for running firewall):
+ufw allow 22/tcp
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw allow 443/udp
+ufw allow from 10.0.0.0/8 to any port 5432 proto tcp
+ufw deny 23/tcp
+ufw limit 2222/tcp

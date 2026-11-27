@@ -1,0 +1,21 @@
+# Acceptance fixture: cis.toml plus an SSH port move 22 -> 2222.
+# Kept a full copy: `profile` cannot come from an include.
+profile = "cis-level1"
+include = ["host.toml"]
+
+[[users.create]]
+name = "ops"
+sudo = true
+shell = "/bin/bash"
+ssh_authorized_keys = ["${ANVIL_ACCEPT_PUBKEY}"]
+
+[firewall]
+restrict_ssh = false         # same plain allow as step1: no allow→limit switch
+
+[updates]
+auto_reboot = false
+
+[lynis]
+
+[sshd]
+port = 2222

@@ -1,0 +1,31 @@
+# examples/netcup-firewall.toml — a hardened netcup server behind its SCP firewall.
+#
+#   export NETCUP_SCP_REFRESH_TOKEN=...   # SCP device flow, client_id scp
+#   anvil validate -c examples/netcup-firewall.toml
+#   anvil apply    -c examples/netcup-firewall.toml --dry-run
+#
+# [netcup] runs on THIS machine (curl + jq), not on the server. anvil owns
+# one SCP user policy ("anvil"): it keeps SSH open on the effective port and
+# adds the rules below, then attaches the policy next to any policy you
+# already attached. Switch the SCP firewall on (implicit ingress DROP_ALL)
+# once in the SCP console; anvil leaves that setting alone.
+profile = "minimal"
+
+[host]
+address = "203.0.113.40"
+user = "admin"
+
+[netcup]
+server = "v2202501234567890123"   # SCP server id, name or nickname
+policy = "anvil"
+
+[[netcup.rules]]
+direction = "in"
+protocol = "tcp"
+port = "443"
+description = "https"
+
+[[netcup.rules]]
+direction = "in"
+protocol = "icmp"
+description = "ping"

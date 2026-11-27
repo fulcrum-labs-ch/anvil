@@ -1,0 +1,21 @@
+# Acceptance fixture (--coding-agents): coding-agents.toml with one list edited.
+# agents, on top of whatever the host already runs. No [sshd]/[firewall]: the
+# host's own config keeps those.
+include = ["host.toml"]
+
+[[users.create]]
+name = "agent"
+shell = "/bin/bash"
+ssh_authorized_keys = ["${ANVIL_ACCEPT_PUBKEY}"]
+
+[coding_agents]
+skills = [
+  { source = "vercel-labs/skills", names = ["find-skills"] },
+  { source = "anthropics/skills", names = ["frontend-design"], agents = ["opencode"] },
+]
+claude_marketplaces = ["anthropics/claude-plugins-official"]
+claude_plugins = ["commit-commands@claude-plugins-official"]
+opencode_mcp = { context-mode = ["npx", "-y", "context-mode@next", "server", "--agent", "opencode"] }
+cpu_quota = "200%"
+memory_max = "4G"
+tasks_max = 512

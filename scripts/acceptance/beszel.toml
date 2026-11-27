@@ -1,0 +1,5 @@
+# Acceptance fixture (--beszel): hub + agent on one host.
+include = ["host.toml"]
+
+[beszel]
+hub = true

@@ -1,0 +1,27 @@
+# examples/fresh-vps.toml — the first config in docs/01_tutorial.md (section 2)
+# for a brand-new VPS: an admin user, locked-down SSH, a default-deny
+# firewall, automatic security updates.
+#
+#   anvil validate -c examples/fresh-vps.toml
+#   anvil diff     -c examples/fresh-vps.toml
+#   anvil apply    -c examples/fresh-vps.toml
+
+[host]
+address = "203.0.113.10"
+user = "root"                # first run only; switch to "admin" afterwards
+identity_file = "~/.ssh/id_ed25519"
+
+[[users.create]]             # runs first, before sshd turns root login off
+name = "admin"
+sudo = true
+shell = "/bin/bash"
+ssh_authorized_keys = ["ssh-ed25519 AAAA… admin@laptop"]
+
+[sshd]                       # defaults: no root login, no passwords, 3 tries
+port = 22
+
+[firewall]                   # deny in, allow out, SSH allowed before enable
+restrict_ssh = false         # plain allow; brute force is fail2ban's job (section 3)
+
+[updates]                    # unattended-upgrades, security origins only
+auto_reboot = false

@@ -1,0 +1,38 @@
+# examples/caddy-proxy.toml — publish localhost services over HTTPS with Caddy.
+#
+#   anvil validate -c examples/caddy-proxy.toml
+#   anvil diff     -c examples/caddy-proxy.toml    # shows the generated Caddyfile
+#
+# Caddy gets and renews certificates itself. Each [[caddy.site]] maps a public
+# hostname to a service that listens only on 127.0.0.1. The caddy module opens
+# 80/tcp, 443/tcp and 443/udp (HTTP/3) in ufw; open the same ports in your
+# provider's firewall (Hetzner, netcup) too. Do not also enable [tls] here:
+# both want ports 80/443.
+
+[host]
+address = "203.0.113.30"
+user = "admin"
+
+[sshd]
+allow_users = ["admin"]
+
+[firewall]
+default_incoming = "deny"
+
+[caddy]
+email = "ops@example.com"
+# ca = "staging"     # Let's Encrypt staging while testing (untrusted certs)
+
+# Forgejo, bound to 127.0.0.1:3000.
+[[caddy.site]]
+domain = "git.example.com"
+upstream = "127.0.0.1:3000"
+
+# A dashboard reachable only from the tailnet.
+[[caddy.site]]
+domain = "stats.example.com"
+upstream = "127.0.0.1:8090"
+allow = ["100.64.0.0/10"]
+# Optional password: make the hash with `caddy hash-password`, then
+# `export STATS_PASSWORD_HASH='$2a$14$...'` before running anvil.
+# basic_auth = { user = "ops", password_hash = "${STATS_PASSWORD_HASH}" }
