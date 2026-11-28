@@ -263,7 +263,7 @@ ephemeral = false
 expiration = "1h"
 ```
 
-`tailnet_only_ssh_confirm` and `keep_public_ssh` are proposed names; names are public contract (CLAUDE.md), so pick them before release.
+`tailnet_only_ssh_confirm` and `keep_public_ssh` are proposed names; names are public contract (AGENTS.md), so pick them before release.
 
 ### Ordering edges
 
@@ -283,13 +283,13 @@ expiration = "1h"
 - `auth_key` and any future `api_token` come only from `${ENV}` (`docs/05_configuration.md:43-48`). Never in the repo.
 - The headscale pre-auth key file lives on the control box, mode 0600. It is never printed by anvil. The operator copies it out-of-band.
 - Netcup SCP credentials: `client_id`/`client_secret` from `${NETCUP_SCP_CLIENT_ID}`/`${NETCUP_SCP_CLIENT_SECRET}`, plus an IP allow-list on the netcup side (third-party docs; verify, §5).
-- Do not put any of these in `escape::shell_escape`-bypassing code. All config-derived values still go through `shell_escape` (CLAUDE.md, escaping rule).
+- Do not put any of these in `escape::shell_escape`-bypassing code. All config-derived values still go through `shell_escape` (AGENTS.md, escaping rule).
 
 ### Idempotent detect / converge
 
 - **Detect for tailnet-only** requires: confirmed reachability (§3 tailscale 1), ufw active, scoped rule present, world rules absent (already true for the existing detect at `tailscale.rs:119-127`).
 - **Converge** only changes ufw when all of the above hold; otherwise it reports and leaves the world rule. Same shape as today.
-- **Probes stay read-only** (CLAUDE.md, §engine). Do not run `tailscale up` in a probe; the existing up-detect (`tailscale.rs:87-93`) is already read-only.
+- **Probes stay read-only** (AGENTS.md, §engine). Do not run `tailscale up` in a probe; the existing up-detect (`tailscale.rs:87-93`) is already read-only.
 
 ### Rollback behaviour
 

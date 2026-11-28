@@ -2,7 +2,7 @@
 
 How the pieces fit, with diagrams: [08_architecture.md](08_architecture.md). The
 numbered behavioral spec: [`DESIGN.md`](../DESIGN.md). Contributor
-conventions: `CLAUDE.md`.
+conventions: `AGENTS.md`.
 
 ## Build & test
 

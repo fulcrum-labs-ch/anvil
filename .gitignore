@@ -8,14 +8,6 @@
 # machine-specific agent notes (never committed)
 /*.local.md
 
-# python bytecode (skill scripts)
-__pycache__/
-
-# private ops repo and the paths .ops/link.sh links from it (never public)
-/.ops/
-/docs/plan
-/docs/capabilities
-/tasks.md
-/AGENTS.md
+# personal agent skills and config (never committed)
 /.opencode/
 /.claude/skills/
